@@ -17,6 +17,8 @@
     --text: #1a2440; --muted: #8a97b8; --muted2: #4e5e82;
   }
   html, body { height: 100%; font-family: 'Pretendard', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
+  body { display: flex; flex-direction: column; }
+  #page-status, #page-mix { flex: 1; min-height: 0; }
 
   /* HEADER */
   header {
@@ -25,6 +27,12 @@
     background: #ffffff; border-bottom: 1px solid var(--border); z-index: 100;
     box-shadow: 0 1px 4px rgba(0,0,0,0.07);
   }
+  /* PAGE TABS (헤더 우측) */
+  .page-tabs { display:flex; gap:4px; }
+  .page-tab { padding:6px 16px; border-radius:6px; border:1px solid var(--border2); background:transparent; font-size:12px; font-weight:700; color:var(--muted2); cursor:pointer; transition:all .15s; font-family:'Pretendard',sans-serif; letter-spacing:.02em; }
+  .page-tab:hover { background:var(--surface2); color:var(--text); }
+  .page-tab.on { background:var(--accent); border-color:var(--accent); color:#fff; }
+
   .logo { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 800; }
   .logo-icon { width: 26px; height: 26px; background: var(--accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; }
   .logo span { color: var(--accent); }
@@ -32,18 +40,102 @@
   .logo-sub { font-size: 11px; color: var(--muted); font-weight: 500; }
 
   /* KPI */
-  .kpi-strip { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; padding:12px 28px; background:#f8faff; border-bottom:1px solid var(--border); }
-  .kpi { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:13px 15px; position:relative; overflow:hidden; }
-  .kpi::after { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--kc,var(--accent)); }
-  .kpi.c2{--kc:var(--accent2)} .kpi.c3{--kc:var(--accent3)} .kpi.c4{--kc:var(--green)} .kpi.c5{--kc:var(--yellow)}
-  .kpi-lbl { font-size:10px; color:var(--muted); font-weight:600; letter-spacing:.07em; text-transform:uppercase; margin-bottom:6px; }
-  .kpi-val { font-family:'DM Mono',monospace; font-size:24px; font-weight:700; }
-  .kpi-val small { font-size:11px; color:var(--muted2); margin-left:2px; }
-  .kpi-sub { font-size:11px; color:var(--muted2); margin-top:4px; }
+  .kpi-strip {
+    display: flex;
+    gap: 8px;
+    padding: 10px 28px;
+    background: #f8faff;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .kpi-cards {
+    flex: 1;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: 1fr 1fr;
+    gap: 8px;
+  }
+  .kpi { background: #ffffff; border: 1px solid var(--border); border-radius: 8px; padding: 11px 14px; position: relative; overflow: hidden; }
+  .kpi::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:var(--kc,var(--accent)); }
+  .kpi.c2{--kc:var(--accent2)} .kpi.c3{--kc:var(--accent3)} .kpi.c4{--kc:var(--accent)} .kpi.c5{--kc:var(--accent3)} .kpi.c6{--kc:var(--green)}
+  .kpi-lbl { font-size:10px; color:var(--muted); font-weight:600; letter-spacing:.05em; margin-bottom:4px; }
+  .kpi-val { font-family:'DM Mono',monospace; font-size:20px; font-weight:800; color:var(--text); line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .kpi-val small { font-size:11px; font-weight:600; color:var(--muted2); margin-left:1px; font-family:'Pretendard',sans-serif; }
+  .kpi-sub { font-size:10px; color:var(--muted); margin-top:3px; }
   .up { color:var(--green); } .dn { color:var(--accent2); }
 
+  /* KPI CHART */
+  .kpi-chart {
+    width: 360px;
+    flex-shrink: 0;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .kpi-chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+  }
+  .kpi-chart-title { font-size: 11px; font-weight: 700; color: var(--text); }
+  .kpi-chart-legend { display: flex; gap: 10px; }
+  .kpi-chart-legend span { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--muted2); }
+  .kpi-chart-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
+  .kpi-chart-legend i.blue { background: var(--accent); }
+  .kpi-chart-legend i.orange { background: var(--accent2); }
+  .kpi-chart-rows { display: flex; flex-direction: column; gap: 7px; flex: 1; justify-content: space-around; }
+  .kpi-chart-row { display: flex; align-items: center; gap: 8px; }
+  .kpi-chart-region { font-size: 11px; font-weight: 600; color: var(--muted2); width: 28px; flex-shrink: 0; text-align: right; }
+  .kpi-chart-bars { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+  .kpi-chart-bar-line { display: flex; align-items: center; gap: 5px; }
+  .kpi-chart-bar-track { flex: 1; height: 8px; background: var(--surface3); border-radius: 2px; overflow: hidden; }
+  .kpi-chart-bar-fill { height: 100%; border-radius: 2px; transition: width .4s ease; }
+  .kpi-chart-bar-fill.blue { background: var(--accent); }
+  .kpi-chart-bar-fill.orange { background: var(--accent2); }
+  .kpi-chart-bar-val { font-size: 10px; font-family: 'DM Mono', monospace; color: var(--muted2); white-space: nowrap; width: 48px; flex-shrink: 0; }
+
   /* MAIN LAYOUT */
-  .main { display:grid; grid-template-columns:1fr 360px; height:calc(100vh - 54px - 94px - 32px); }
+  .main { display: grid; grid-template-columns: 360px 1fr 360px; flex: 1; min-height: 0; }
+
+  /* LEFT PANEL */
+  .left-panel { border-right: 1px solid var(--border); display: flex; flex-direction: column; background: var(--surface); overflow: hidden; }
+  .left-panel-header { padding: 14px 16px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .left-panel-title { font-size: 13px; font-weight: 800; color: var(--text); }
+  .left-panel-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  /* FILTER PANEL */
+  .filter-scroll { flex: 1; overflow-y: auto; padding: 6px 0 10px; }
+  .filter-scroll::-webkit-scrollbar { width: 3px; }
+  .filter-scroll::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+  .filter-section { padding: 9px 14px; border-bottom: 1px solid var(--border); }
+  .filter-section:last-child { border-bottom: none; }
+  .filter-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 7px; }
+  .filter-select {
+    width: 100%; padding: 6px 28px 6px 10px; border-radius: 7px;
+    border: 1px solid var(--border2); background: var(--surface);
+    font-size: 12px; font-weight: 600; color: var(--text);
+    font-family: 'Pretendard', sans-serif; cursor: pointer;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a97b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
+    transition: border-color .15s, box-shadow .15s; outline: none;
+  }
+  .filter-select:hover { border-color: var(--border2); background-color: var(--surface2); }
+  .filter-select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,136,204,.15); }
+  .filter-select.pending { border-color: var(--accent); color: var(--accent); }
+  .filter-actions { display: flex; gap: 6px; padding: 10px 14px 12px; }
+  .filter-reset { flex: 1; padding: 7px; border-radius: 7px; border: 1px solid var(--border2); background: transparent; font-size: 11px; font-weight: 600; color: var(--muted2); cursor: pointer; text-align: center; transition: all .15s; font-family: 'Pretendard', sans-serif; }
+  .filter-reset:hover { background: var(--surface2); color: var(--text); }
+  .filter-apply { flex: 1.4; padding: 7px; border-radius: 7px; border: none; background: var(--accent); font-size: 11px; font-weight: 700; color: #fff; cursor: pointer; text-align: center; transition: all .15s; font-family: 'Pretendard', sans-serif; }
+  .filter-apply:hover { background: #0077bb; }
+  .filter-apply.dirty { background: var(--accent2); }
 
   /* MAP */
   .map-wrap { position:relative; background:var(--surface2); overflow:hidden; }
@@ -75,10 +167,10 @@
   /* RIGHT PANEL */
   .panel { border-left:1px solid var(--border); display:flex; flex-direction:column; background:var(--surface); overflow:hidden; }
   .tabs { display:flex; border-bottom:1px solid var(--border); flex-shrink:0; }
-  .tab { flex:1; padding:14px 10px; text-align:center; font-size:12px; font-weight:700; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; letter-spacing:.04em; transition:all .18s; }
+  .tab { flex:1; padding:9px 10px; text-align:center; font-size:12px; font-weight:700; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; letter-spacing:.04em; transition:all .18s; }
   .tab:hover { color:var(--muted2); background:rgba(0,0,0,.03); }
   .tab.on { color:var(--accent); border-bottom-color:var(--accent); background:rgba(0,136,204,.06); }
-  .tab-content { flex:1; overflow-y:auto; }
+  .tab-content { flex:1; overflow-y:hidden; display:flex; flex-direction:column; }
   .tab-content::-webkit-scrollbar { width:3px; }
   .tab-content::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
 
@@ -92,37 +184,37 @@
   .ana-empty-sub { font-size:12px; line-height:1.6; }
 
   /* 선택 후 */
-  .ana-selected { display:flex; flex-direction:column; }
-  .ana-img { width:100%; height:190px; object-fit:cover; background:linear-gradient(135deg,#c5d8ee,#a0b8d8); display:flex; align-items:center; justify-content:center; font-size:50px; flex-shrink:0; position:relative; }
-  .ana-img-badge { position:absolute; top:10px; right:10px; background:rgba(0,136,204,.2); border:1px solid rgba(0,136,204,.4); color:#005a8a; font-size:10px; font-weight:700; padding:4px 8px; border-radius:4px; }
-  .ana-img-badge2 { position:absolute; top:10px; left:10px; background:rgba(255,255,255,.8); border:1px solid var(--border2); color:var(--muted2); font-size:10px; padding:4px 8px; border-radius:4px; }
+  .ana-selected { display:flex; flex-direction:column; flex:1; min-height:0; }
+  .ana-img { width:100%; flex:1; min-height:140px; object-fit:cover; background:linear-gradient(135deg,#c5d8ee,#a0b8d8); display:flex; align-items:center; justify-content:center; font-size:40px; position:relative; }
+  .ana-img-badge { position:absolute; top:8px; right:8px; background:rgba(0,136,204,.2); border:1px solid rgba(0,136,204,.4); color:#005a8a; font-size:10px; font-weight:700; padding:3px 7px; border-radius:4px; }
+  .ana-img-badge2 { position:absolute; top:8px; left:8px; background:rgba(255,255,255,.8); border:1px solid var(--border2); color:var(--muted2); font-size:10px; padding:3px 7px; border-radius:4px; }
 
-  .ana-body { padding:16px; flex:1; }
-  .ana-name { font-size:15px; font-weight:800; margin-bottom:3px; }
-  .ana-loc { font-size:11px; color:var(--muted2); margin-bottom:12px; display:flex; align-items:center; gap:5px; }
+  .ana-body { padding:10px 14px; flex-shrink:0; overflow-y:auto; }
+  .ana-name { font-size:13px; font-weight:800; margin-bottom:2px; }
+  .ana-loc { font-size:10px; color:var(--muted2); margin-bottom:8px; display:flex; align-items:center; gap:5px; }
 
-  .stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; }
-  .stat-box { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px 12px; }
-  .stat-lbl { font-size:10px; color:var(--muted); font-weight:600; letter-spacing:.05em; text-transform:uppercase; margin-bottom:4px; }
-  .stat-val { font-family:'DM Mono',monospace; font-size:16px; font-weight:700; color:var(--text); }
+  .stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:8px; }
+  .stat-box { background:var(--surface2); border:1px solid var(--border); border-radius:7px; padding:7px 10px; }
+  .stat-lbl { font-size:9px; color:var(--muted); font-weight:600; letter-spacing:.05em; text-transform:uppercase; margin-bottom:3px; }
+  .stat-val { font-family:'DM Mono',monospace; font-size:14px; font-weight:700; color:var(--text); }
   .stat-val.cyan { color:var(--accent); } .stat-val.purple { color:var(--accent3); } .stat-val.green { color:var(--green); } .stat-val.orange { color:var(--accent2); }
 
-  .bar-label { font-size:11px; color:var(--muted2); margin-bottom:6px; font-weight:600; }
-  .bar-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
-  .bar-name { font-size:11px; color:var(--muted2); width:48px; text-align:right; flex-shrink:0; }
-  .bar-track { flex:1; height:6px; background:var(--surface3); border-radius:3px; overflow:hidden; }
+  .bar-label { font-size:10px; color:var(--muted2); margin-bottom:4px; font-weight:600; }
+  .bar-row { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+  .bar-name { font-size:10px; color:var(--muted2); width:40px; text-align:right; flex-shrink:0; }
+  .bar-track { flex:1; height:5px; background:var(--surface3); border-radius:3px; overflow:hidden; }
   .bar-fill { height:100%; border-radius:3px; }
-  .bar-pct { font-size:10px; color:var(--muted2); width:30px; font-family:'DM Mono',monospace; }
+  .bar-pct { font-size:10px; color:var(--muted2); width:28px; font-family:'DM Mono',monospace; }
 
-  .ana-divider { height:1px; background:var(--border); margin:12px 0; }
+  .ana-divider { height:1px; background:var(--border); margin:8px 0; }
 
-  .execution-img { font-size:11px; color:var(--muted2); font-weight:600; letter-spacing:.05em; text-transform:uppercase; margin-bottom:8px; }
-  .exec-img-box { width:100%; height:120px; background:linear-gradient(135deg,#b8ccde,#c8b8de); border-radius:8px; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:32px; position:relative; overflow:hidden; }
-  .exec-img-overlay { position:absolute; bottom:0; left:0; right:0; padding:8px 10px; background:linear-gradient(transparent,rgba(255,255,255,.75)); font-size:11px; color:rgba(30,40,80,.8); }
+  .execution-img { font-size:10px; color:var(--muted2); font-weight:600; letter-spacing:.05em; text-transform:uppercase; margin-bottom:6px; }
+  .exec-img-box { width:100%; height:90px; background:linear-gradient(135deg,#b8ccde,#c8b8de); border-radius:7px; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:28px; position:relative; overflow:hidden; }
+  .exec-img-overlay { position:absolute; bottom:0; left:0; right:0; padding:6px 8px; background:linear-gradient(transparent,rgba(255,255,255,.75)); font-size:10px; color:rgba(30,40,80,.8); }
 
   /* 이미지 토글 스트립 */
   .img-toggle-strip { display:flex; flex-shrink:0; border-bottom:1px solid var(--border); background:var(--surface); }
-  .img-toggle-btn { flex:1; padding:8px 0; font-size:11px; font-weight:700; color:var(--muted); background:transparent; border:none; border-bottom:2px solid transparent; cursor:pointer; letter-spacing:.03em; transition:all .18s; }
+  .img-toggle-btn { flex:1; padding:6px 0; font-size:11px; font-weight:700; color:var(--muted); background:transparent; border:none; border-bottom:2px solid transparent; cursor:pointer; letter-spacing:.03em; transition:all .18s; }
   .img-toggle-btn:hover { color:var(--muted2); background:rgba(0,0,0,.02); }
   .img-toggle-btn.active { color:var(--accent); border-bottom-color:var(--accent); background:rgba(0,136,204,.05); }
 
@@ -135,45 +227,244 @@
   .exec-card-brand { font-size:13px; font-weight:800; color:#fff; margin-bottom:2px; text-shadow:0 1px 4px rgba(0,0,0,.4); }
   .exec-card-period { font-size:10px; color:rgba(255,255,255,.75); }
 
-  .wish-add-btn { width:100%; margin-top:12px; padding:10px; border-radius:7px; border:1px solid rgba(0,136,204,.3); background:rgba(0,136,204,.07); color:var(--accent); font-size:13px; font-weight:700; cursor:pointer; transition:all .18s; }
+  .wish-add-btn { width:100%; padding:9px; border-radius:7px; border:1px solid rgba(0,136,204,.3); background:rgba(0,136,204,.07); color:var(--accent); font-size:12px; font-weight:700; cursor:pointer; transition:all .18s; font-family:'Pretendard',sans-serif; }
   .wish-add-btn:hover { background:rgba(0,136,204,.14); }
   .wish-add-btn.added { background:var(--accent); color:#fff; border-color:var(--accent); }
 
-  /* ── 견적 TAB ── */
-  .quote-tab { padding:16px; }
-  .sec-label { font-size:10px; color:var(--muted); font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:10px; }
+  /* 패널 공통 하단 CTA 바 */
+  .panel-cta { flex-shrink:0; padding:10px 14px 12px; border-top:1px solid var(--border); background:var(--surface); display:flex; flex-direction:column; gap:5px; }
 
-  .wish-item { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:8px; display:flex; gap:10px; cursor:pointer; transition:border-color .18s, background .18s; }
+  /* ── 견적 TAB ── */
+  .quote-tab { display:flex; flex-direction:column; flex:1; min-height:0; }
+  .quote-scroll { flex:1; min-height:0; overflow-y:auto; padding:10px 12px 0; }
+  .sec-label { font-size:10px; color:var(--muted); font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:7px; }
+
+  .wish-item { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:8px 10px; margin-bottom:6px; display:flex; gap:8px; cursor:pointer; transition:border-color .18s, background .18s; }
   .wish-item:hover { border-color:var(--border2); }
   .wish-item.sel { border-color:rgba(0,136,204,.4); background:rgba(0,136,204,.06); }
-  .wish-thumb { width:56px; height:46px; border-radius:6px; background:linear-gradient(135deg,#b8cce0,#8dacc8); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:18px; }
+  .wish-thumb { width:44px; height:36px; border-radius:5px; background:linear-gradient(135deg,#b8cce0,#8dacc8); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:16px; }
   .wish-info { flex:1; min-width:0; }
-  .wish-name { font-size:12px; font-weight:700; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .wish-loc { font-size:10px; color:var(--muted2); margin-bottom:5px; }
+  .wish-name { font-size:11px; font-weight:700; margin-bottom:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .wish-loc { font-size:10px; color:var(--muted2); margin-bottom:3px; }
   .wish-tags { display:flex; gap:4px; }
   .tag { font-size:9px; padding:2px 6px; border-radius:3px; font-weight:600; }
   .tc { background:rgba(0,136,204,.12); color:var(--accent); }
   .tp { background:rgba(108,71,232,.12); color:var(--accent3); }
   .to { background:rgba(232,82,30,.12); color:var(--accent2); }
   .tg { background:rgba(18,168,122,.12); color:var(--green); }
-  .wish-price { font-family:'DM Mono',monospace; font-size:12px; font-weight:700; color:var(--text); flex-shrink:0; text-align:right; }
-  .wish-price small { display:block; font-size:9px; color:var(--muted); font-family:'Pretendard',sans-serif; margin-bottom:3px; }
-  .chk { width:18px; height:18px; border-radius:4px; border:1px solid var(--border2); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:10px; margin-left:2px; }
+  .wish-price { font-family:'DM Mono',monospace; font-size:11px; font-weight:700; color:var(--text); flex-shrink:0; text-align:right; }
+  .wish-price small { display:block; font-size:9px; color:var(--muted); font-family:'Pretendard',sans-serif; margin-bottom:2px; }
+  .chk { width:16px; height:16px; border-radius:4px; border:1px solid var(--border2); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:9px; margin-left:2px; }
   .chk.on { background:var(--accent); border-color:var(--accent); color:#000; font-weight:800; }
 
-  .divider { height:1px; background:var(--border); margin:12px 0; }
+  .divider { height:1px; background:var(--border); margin:8px 0; }
 
-  .quote-box { background:var(--surface2); border:1px solid rgba(0,136,204,.2); border-radius:10px; padding:14px; }
-  .q-row { display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid var(--border); font-size:12px; }
+  .quote-box { background:var(--surface2); border:1px solid rgba(0,136,204,.2); border-radius:8px; padding:10px; }
+  .q-row { display:flex; justify-content:space-between; align-items:center; padding:5px 0; border-bottom:1px solid var(--border); font-size:11px; }
   .q-row:last-child { border:none; }
   .q-lbl { color:var(--muted2); }
   .q-val { font-family:'DM Mono',monospace; font-weight:600; }
-  .q-total { background:rgba(0,136,204,.07); border-radius:8px; padding:12px 14px; margin-top:10px; display:flex; justify-content:space-between; align-items:center; border:1px solid rgba(0,136,204,.18); }
-  .q-total-lbl { font-size:12px; font-weight:700; }
-  .q-total-lbl small { display:block; font-size:10px; color:var(--muted); font-weight:400; margin-top:2px; }
-  .q-total-val { font-family:'DM Mono',monospace; font-size:22px; font-weight:800; color:var(--accent); }
-  .btn-quote { width:100%; margin-top:10px; padding:11px; border-radius:7px; background:var(--accent); color:#fff; font-size:13px; font-weight:800; border:none; cursor:pointer; letter-spacing:.02em; }
-  .btn-quote2 { width:100%; margin-top:6px; padding:10px; border-radius:7px; border:1px solid var(--border2); background:transparent; color:var(--muted2); font-size:12px; font-weight:600; cursor:pointer; }
+  .q-total { background:rgba(0,136,204,.07); border-radius:7px; padding:8px 12px; margin-top:8px; display:flex; justify-content:space-between; align-items:center; border:1px solid rgba(0,136,204,.18); }
+  .q-total-lbl { font-size:11px; font-weight:700; }
+  .q-total-lbl small { display:block; font-size:9px; color:var(--muted); font-weight:400; margin-top:1px; }
+  .q-total-val { font-family:'DM Mono',monospace; font-size:18px; font-weight:800; color:var(--accent); }
+  .btn-quote { width:100%; padding:9px; border-radius:7px; background:var(--accent); color:#fff; font-size:12px; font-weight:800; border:none; cursor:pointer; letter-spacing:.02em; font-family:'Pretendard',sans-serif; }
+  .btn-quote:hover { background:#0077bb; }
+  .btn-quote2 { width:100%; padding:8px; border-radius:7px; border:1px solid var(--border2); background:transparent; color:var(--muted2); font-size:11px; font-weight:600; cursor:pointer; font-family:'Pretendard',sans-serif; }
+  .btn-quote2:hover { background:var(--surface2); color:var(--text); }
+
+  /* ── 캠페인 리스트 스트립 (미디어믹스 페이지) ── */
+  .campaign-strip {
+    flex-shrink: 0;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .campaign-strip-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .campaign-strip-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted2);
+    letter-spacing: .03em;
+  }
+  .campaign-strip-actions { display: flex; gap: 5px; }
+  .camp-btn {
+    padding: 5px 13px;
+    border-radius: 5px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted2);
+    cursor: pointer;
+    font-family: 'Pretendard', sans-serif;
+    transition: all .13s;
+  }
+  .camp-btn:hover { background: var(--surface2); color: var(--text); }
+  .camp-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .camp-btn.primary:hover { background: #0077bb; }
+  .camp-btn.danger { color: var(--accent2); border-color: rgba(232,82,30,.35); }
+  .camp-btn.danger:hover { background: rgba(232,82,30,.07); }
+
+  .camp-form {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 0 6px; border-bottom: 1px solid var(--border); flex-wrap: wrap;
+  }
+  .camp-form-label { font-size: 11px; font-weight: 600; color: var(--muted2); white-space: nowrap; }
+  .camp-form-tilde { font-size: 12px; color: var(--muted); }
+  .camp-input {
+    padding: 5px 9px; border: 1px solid var(--border2); border-radius: 6px;
+    font-size: 12px; font-family: 'Pretendard', sans-serif; color: var(--text);
+    outline: none; height: 30px; background: var(--surface);
+  }
+  .camp-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,136,204,.12); }
+  .camp-input.w-name   { width: 180px; }
+  .camp-input.w-date   { width: 128px; }
+  .camp-input.w-budget { width: 130px; }
+
+  /* ── AI 미디어믹스 추천 ── */
+  .ai-section { padding: 10px 14px 14px; }
+  .ai-section-header { display:flex; align-items:center; gap:7px; margin-bottom:5px; }
+  .ai-badge {
+    font-size:9px; font-weight:800; padding:2px 7px; border-radius:4px;
+    background:linear-gradient(135deg,#6c47e8,#0088cc); color:#fff; letter-spacing:.05em;
+  }
+  .ai-section-title { font-size:12px; font-weight:800; color:var(--text); }
+  .ai-section-sub { font-size:10px; color:var(--muted); line-height:1.55; margin-bottom:9px; }
+  .ai-textarea {
+    width:100%; height:76px; padding:8px 10px;
+    border:1px solid var(--border2); border-radius:7px;
+    font-size:11px; font-family:'Pretendard',sans-serif; color:var(--text);
+    resize:none; outline:none; background:var(--surface); line-height:1.6;
+  }
+  .ai-textarea:focus { border-color:var(--accent3); box-shadow:0 0 0 2px rgba(108,71,232,.12); }
+  .ai-textarea::placeholder { color:var(--muted); }
+  .ai-btn {
+    width:100%; margin-top:7px; padding:8px; border-radius:7px; border:none;
+    background:linear-gradient(135deg,#6c47e8,#0088cc);
+    color:#fff; font-size:11px; font-weight:700; cursor:pointer;
+    font-family:'Pretendard',sans-serif; transition:opacity .15s; letter-spacing:.02em;
+  }
+  .ai-btn:hover { opacity:.88; }
+  .ai-btn:disabled { opacity:.5; cursor:default; }
+  .ai-result { margin-top:10px; display:flex; flex-direction:column; gap:5px; }
+  .ai-result-lbl { font-size:10px; font-weight:700; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; margin-bottom:2px; }
+  .ai-mix-row { display:flex; align-items:center; gap:7px; }
+  .ai-mix-name { font-size:10px; font-weight:600; color:var(--muted2); width:86px; flex-shrink:0; }
+  .ai-mix-track { flex:1; height:7px; background:var(--surface3); border-radius:4px; overflow:hidden; }
+  .ai-mix-fill { height:100%; border-radius:4px; }
+  .ai-mix-pct { font-size:10px; font-family:'DM Mono',monospace; color:var(--muted2); width:28px; flex-shrink:0; text-align:right; }
+  .ai-budget-box {
+    margin-top:6px; padding:8px 10px;
+    background:var(--surface2); border:1px solid var(--border); border-radius:7px;
+    font-size:10px; color:var(--muted2); line-height:1.9;
+  }
+  .ai-budget-box strong { color:var(--text); font-weight:700; display:block; margin-bottom:2px; }
+  .ai-loading { text-align:center; padding:14px 0; font-size:11px; color:var(--muted); display:flex; align-items:center; justify-content:center; gap:7px; }
+  @keyframes ai-spin { to { transform:rotate(360deg); } }
+  .ai-spinner { width:14px; height:14px; border:2px solid var(--border2); border-top-color:var(--accent3); border-radius:50%; animation:ai-spin .7s linear infinite; flex-shrink:0; }
+
+  /* 캠페인 스트립 바디 — 좌우 반반 */
+  .campaign-strip-body { display:flex; min-height:0; height:260px; }
+  .campaign-table-col  { flex:1; min-width:0; display:flex; flex-direction:column; border-right:1px solid var(--border); }
+  .campaign-table-col .campaign-strip-header { flex-shrink:0; padding:8px 10px 6px; border-bottom:1px solid var(--border); }
+  .campaign-table-col .campaign-table-wrap { flex:1; min-height:0; overflow-y:auto; overflow-x:auto; }
+  .campaign-kpi-col    { flex:1; min-width:0; display:flex; gap:0; overflow:hidden; }
+  .camp-kpi-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:6px; color:var(--muted); font-size:11px; text-align:center; }
+  .camp-kpi-empty-icon { font-size:22px; opacity:.4; }
+  .camp-kpi-grid { display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr 1fr; gap:5px; flex:1; flex-shrink:0; padding:10px 12px; overflow-y:auto; }
+  .camp-kpi-card { background:var(--surface2); border:1px solid var(--border); border-radius:7px; padding:6px 9px; position:relative; overflow:hidden; }
+  .camp-kpi-card::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:var(--ckc,var(--accent)); }
+  .camp-kpi-lbl { font-size:9px; color:var(--muted); font-weight:600; letter-spacing:.05em; text-transform:uppercase; margin-bottom:3px; }
+  .camp-kpi-val { font-family:'DM Mono',monospace; font-size:14px; font-weight:800; color:var(--text); line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .camp-kpi-val small { font-size:10px; font-weight:600; color:var(--muted2); margin-left:1px; font-family:'Pretendard',sans-serif; }
+  .camp-kpi-sub { font-size:9px; color:var(--muted); margin-top:2px; }
+  /* 선택된 캠페인 행 강조 */
+  .campaign-table tbody tr.active { background:rgba(0,136,204,.08); }
+  .campaign-table tbody tr.active td { color:var(--text); }
+
+  /* Campaign product list */
+  .camp-product-section { flex:1; min-width:0; display:flex; flex-direction:column; border-left:1px solid var(--border); max-width:50%; }
+  .camp-product-header { display:flex; align-items:center; justify-content:space-between; padding:6px 10px; flex-shrink:0; border-bottom:1px solid var(--border); }
+  .camp-product-title { font-size:10px; font-weight:700; color:var(--muted); letter-spacing:.05em; text-transform:uppercase; }
+  .camp-product-item { display:flex; align-items:center; gap:7px; padding:5px 7px; background:var(--surface); border:1px solid var(--border); border-radius:6px; margin-bottom:3px; font-size:11px; }
+  .camp-product-item:hover { border-color:var(--border2); }
+  .camp-product-icon { width:22px; height:22px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:11px; flex-shrink:0; background:rgba(0,136,204,.07); }
+  .camp-product-info { flex:1; min-width:0; }
+  .camp-product-name { font-weight:700; color:var(--text); font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .camp-product-meta { font-size:9px; color:var(--muted); }
+  .camp-product-price { font-family:'DM Mono',monospace; font-weight:600; color:var(--text); font-size:10px; flex-shrink:0; }
+  .camp-product-del { width:16px; height:16px; border-radius:3px; border:1px solid rgba(232,82,30,.3); background:transparent; color:var(--accent2); font-size:9px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .12s; }
+  .camp-product-del:hover { background:rgba(232,82,30,.1); }
+  .camp-product-scroll { flex:1; min-height:0; overflow-y:auto; padding:4px 8px; }
+  .camp-product-empty { text-align:center; padding:12px; color:var(--muted); font-size:10px; }
+
+  /* Add product modal */
+  .add-product-modal { position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:1000; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(2px); }
+  .add-product-box { background:#fff; border-radius:12px; width:540px; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 8px 32px rgba(0,0,0,.2); }
+  .add-product-box-header { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+  .add-product-box-title { font-size:14px; font-weight:800; }
+  .add-product-box-close { width:28px; height:28px; border:none; background:var(--surface2); border-radius:6px; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--muted2); }
+  .add-product-box-close:hover { background:var(--surface3); color:var(--text); }
+  .add-product-box-search { padding:8px 14px; border-bottom:1px solid var(--border); flex-shrink:0; }
+  .add-product-search-input { width:100%; padding:7px 10px; border:1px solid var(--border2); border-radius:7px; font-size:12px; font-family:'Pretendard',sans-serif; outline:none; }
+  .add-product-search-input:focus { border-color:var(--accent); box-shadow:0 0 0 2px rgba(0,136,204,.12); }
+  .add-product-box-body { flex:1; min-height:0; overflow-y:auto; padding:8px 14px; }
+  .add-product-row { display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid var(--border); border-radius:7px; margin-bottom:5px; cursor:pointer; transition:all .12s; }
+  .add-product-row:hover { border-color:var(--accent); background:rgba(0,136,204,.04); }
+  .add-product-row.already { opacity:.45; pointer-events:none; }
+  .add-product-row-icon { font-size:16px; flex-shrink:0; }
+  .add-product-row-info { flex:1; min-width:0; }
+  .add-product-row-name { font-size:12px; font-weight:700; }
+  .add-product-row-detail { font-size:10px; color:var(--muted); margin-top:1px; }
+  .add-product-row-price { font-family:'DM Mono',monospace; font-size:11px; font-weight:600; flex-shrink:0; color:var(--text); }
+  .add-product-box-footer { padding:10px 14px; border-top:1px solid var(--border); flex-shrink:0; display:flex; gap:6px; justify-content:flex-end; }
+
+  .campaign-table-wrap { overflow-x:auto; }
+  .campaign-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+  .campaign-table thead tr {
+    background: var(--surface2);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .campaign-table th {
+    padding: 6px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted2);
+    letter-spacing: .04em;
+    text-align: left;
+    white-space: nowrap;
+  }
+  .campaign-table th.r, .campaign-table td.r { text-align: right; }
+  .campaign-table th.c, .campaign-table td.c { text-align: center; }
+  .campaign-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background .12s;
+  }
+  .campaign-table tbody tr:hover { background: var(--surface2); }
+  .campaign-table tbody tr.sel { background: rgba(0,136,204,.06); }
+  .campaign-table tbody tr.sel td { color: var(--text); }
+  .campaign-table td {
+    padding: 7px 10px;
+    color: var(--muted2);
+    white-space: nowrap;
+  }
+  .campaign-table td.name { font-weight: 700; color: var(--text); }
+  .campaign-table td.mono { font-family: 'DM Mono', monospace; font-weight: 600; color: var(--text); }
+  .campaign-table input[type="checkbox"] { cursor: pointer; accent-color: var(--accent); width: 13px; height: 13px; }
 
   /* BOTTOM BAR */
   .bottom-bar { height:32px; background:#f0f3fa; border-top:1px solid var(--border); display:flex; align-items:center; padding:0 28px; gap:20px; }
@@ -183,6 +474,12 @@
 
   /* MOCK NOTE */
   .mock-note { position:fixed; bottom:44px; left:50%; transform:translateX(-50%); background:rgba(232,82,30,.12); border:1px solid var(--accent2); color:var(--accent2); font-size:12px; font-weight:600; padding:8px 20px; border-radius:999px; z-index:999; backdrop-filter:blur(10px); pointer-events:none; }
+
+  /* 지하철 토글 */
+  .subway-toggle-leg { padding:2px 6px; border-radius:4px; transition:background .15s; cursor:pointer; user-select:none; }
+  .subway-toggle-leg:hover { background:rgba(0,0,0,.06); }
+  .subway-badge { font-size:9px; padding:1px 5px; border-radius:3px; font-weight:700; background:rgba(0,136,204,.15); color:var(--accent); margin-left:2px; transition:all .18s; }
+  .subway-badge.off { background:rgba(0,0,0,.06); color:var(--muted); }
 
   /* Scrollbar global */
   * { scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
@@ -218,39 +515,198 @@
     <div class="logo-div"></div>
     <div class="logo-sub">옥외광고 현황 관리 시스템</div>
   </div>
+  <div class="page-tabs">
+    <button class="page-tab on" id="ptab-status">진행현황</button>
+    <button class="page-tab" id="ptab-mix">미디어믹스</button>
+  </div>
 </header>
 
+<div id="page-status" style="display:flex;flex-direction:column;flex:1;min-height:0;">
 <!-- KPI STRIP -->
 <div class="kpi-strip">
-  <div class="kpi">
-    <div class="kpi-lbl">총 광고 지면</div>
-    <div class="kpi-val">247<small>개</small></div>
-    <div class="kpi-sub">서울 전체 등록 매체</div>
+  <div class="kpi-cards">
+    <!-- Row 1 -->
+    <div class="kpi">
+      <div class="kpi-lbl">광고 지면</div>
+      <div class="kpi-val">247<small>개</small></div>
+      <div class="kpi-sub">진행 매체</div>
+    </div>
+    <div class="kpi c2">
+      <div class="kpi-lbl">총 유동 인구</div>
+      <div class="kpi-val">650,000<small>명</small></div>
+    </div>
+    <div class="kpi c3">
+      <div class="kpi-lbl">총 노출수</div>
+      <div class="kpi-val">570,000,000<small>회</small></div>
+    </div>
+    <!-- Row 2 -->
+    <div class="kpi c4">
+      <div class="kpi-lbl">광고 비용</div>
+      <div class="kpi-val">650,000,000<small>원</small></div>
+    </div>
+    <div class="kpi c5">
+      <div class="kpi-lbl">유동 인구당 비용</div>
+      <div class="kpi-val">20<small>원</small></div>
+    </div>
+    <div class="kpi c6">
+      <div class="kpi-lbl">CPM</div>
+      <div class="kpi-val">2,568<small>원</small></div>
+    </div>
   </div>
-  <div class="kpi c2">
-    <div class="kpi-lbl">집행 중</div>
-    <div class="kpi-val">38<small>건</small></div>
-    <div class="kpi-sub dn">현재 운영 캠페인</div>
-  </div>
-  <div class="kpi c3">
-    <div class="kpi-lbl">월 예상 노출</div>
-    <div class="kpi-val">1.2<small>억회</small></div>
-    <div class="kpi-sub up">▲ 12% vs 전월</div>
-  </div>
-  <div class="kpi c4">
-    <div class="kpi-lbl">평균 CPM</div>
-    <div class="kpi-val">₩4,200</div>
-    <div class="kpi-sub up">시장比 -8% 우위</div>
-  </div>
-  <div class="kpi c5">
-    <div class="kpi-lbl">선택 지면</div>
-    <div class="kpi-val">6<small>개</small></div>
-    <div class="kpi-sub" style="color:var(--yellow)">예상 견적 ₩50M</div>
+  <!-- 지역별 차트 (2행 span) -->
+  <div class="kpi-chart">
+    <div class="kpi-chart-header">
+      <span class="kpi-chart-title">지역별 집행 예산 &amp; CPM</span>
+      <div class="kpi-chart-legend">
+        <span><i class="blue"></i>예산</span>
+        <span><i class="orange"></i>CPM</span>
+      </div>
+    </div>
+    <div class="kpi-chart-rows">
+      <div class="kpi-chart-row">
+        <div class="kpi-chart-region">강남</div>
+        <div class="kpi-chart-bars">
+          <div class="kpi-chart-bar-line">
+            <div class="kpi-chart-bar-track"><div class="kpi-chart-bar-fill blue" style="width:100%"></div></div>
+            <span class="kpi-chart-bar-val">5.8억</span>
+          </div>
+          <div class="kpi-chart-bar-line">
+            <div class="kpi-chart-bar-track"><div class="kpi-chart-bar-fill orange" style="width:100%"></div></div>
+            <span class="kpi-chart-bar-val">5,580원</span>
+          </div>
+        </div>
+      </div>
+      <div class="kpi-chart-row">
+        <div class="kpi-chart-region">영동</div>
+        <div class="kpi-chart-bars">
+          <div class="kpi-chart-bar-line">
+            <div class="kpi-chart-bar-track"><div class="kpi-chart-bar-fill blue" style="width:55%"></div></div>
+            <span class="kpi-chart-bar-val">3.2억</span>
+          </div>
+          <div class="kpi-chart-bar-line">
+            <div class="kpi-chart-bar-track"><div class="kpi-chart-bar-fill orange" style="width:46%"></div></div>
+            <span class="kpi-chart-bar-val">2,560원</span>
+          </div>
+        </div>
+      </div>
+      <div class="kpi-chart-row">
+        <div class="kpi-chart-region">성수</div>
+        <div class="kpi-chart-bars">
+          <div class="kpi-chart-bar-line">
+            <div class="kpi-chart-bar-track"><div class="kpi-chart-bar-fill blue" style="width:83%"></div></div>
+            <span class="kpi-chart-bar-val">4.8억</span>
+          </div>
+          <div class="kpi-chart-bar-line">
+            <div class="kpi-chart-bar-track"><div class="kpi-chart-bar-fill orange" style="width:86%"></div></div>
+            <span class="kpi-chart-bar-val">4,780원</span>
+          </div>
+        </div>
+      </div>
+      <div class="kpi-chart-row">
+        <div class="kpi-chart-region">판교</div>
+        <div class="kpi-chart-bars">
+          <div class="kpi-chart-bar-line">
+            <div class="kpi-chart-bar-track"><div class="kpi-chart-bar-fill blue" style="width:52%"></div></div>
+            <span class="kpi-chart-bar-val">3억</span>
+          </div>
+          <div class="kpi-chart-bar-line">
+            <div class="kpi-chart-bar-track"><div class="kpi-chart-bar-fill orange" style="width:32%"></div></div>
+            <span class="kpi-chart-bar-val">1,780원</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
 <!-- MAIN -->
 <div class="main">
+
+  <!-- LEFT PANEL: 옥외광고 리스트 -->
+  <div class="left-panel">
+    <div class="left-panel-header">
+      <div class="left-panel-title">필터</div>
+      <div class="left-panel-sub">조건 선택 후 적용 버튼을 눌러주세요</div>
+    </div>
+    <div class="filter-scroll">
+
+      <div class="filter-section">
+        <div class="filter-label">브랜드</div>
+        <select class="filter-select" data-filter="brand">
+          <option value="">전체</option>
+          <option value="DX">DX</option>
+          <option value="MLB">MLB</option>
+        </select>
+      </div>
+
+      <div class="filter-section">
+        <div class="filter-label">시즌</div>
+        <select class="filter-select" data-filter="season">
+          <option value="">전체</option>
+          <option value="25FW">25FW</option>
+          <option value="25SS">25SS</option>
+        </select>
+      </div>
+
+      <div class="filter-section">
+        <div class="filter-label">지역</div>
+        <select class="filter-select" data-filter="region">
+          <option value="">전체</option>
+          <option value="강남">강남</option>
+          <option value="명동">명동</option>
+          <option value="판교">판교</option>
+          <option value="잠실">잠실</option>
+          <option value="홍대">홍대</option>
+          <option value="여의도">여의도</option>
+        </select>
+      </div>
+
+      <div class="filter-section">
+        <div class="filter-label">상품 유형 1</div>
+        <select class="filter-select" data-filter="pt1">
+          <option value="">전체</option>
+          <option value="OOH">OOH</option>
+          <option value="DOOH">DOOH</option>
+        </select>
+      </div>
+
+      <div class="filter-section">
+        <div class="filter-label">상품 유형 2</div>
+        <select class="filter-select" data-filter="pt2">
+          <option value="">전체</option>
+          <option value="전광판">전광판</option>
+          <option value="지하철">지하철</option>
+          <option value="버스쉘터">버스쉘터</option>
+          <option value="쇼핑몰">쇼핑몰</option>
+        </select>
+      </div>
+
+      <div class="filter-section">
+        <div class="filter-label">집행 상태</div>
+        <select class="filter-select" data-filter="status">
+          <option value="">전체</option>
+          <option value="집행전">집행 전</option>
+          <option value="집행중">집행중</option>
+          <option value="집행완료">집행 완료</option>
+          <option value="미집행">미집행</option>
+        </select>
+      </div>
+
+      <div class="filter-section">
+        <div class="filter-label">캠페인</div>
+        <select class="filter-select" data-filter="campaign">
+          <option value="">전체</option>
+          <option value="닝닝(봄)">닝닝(봄)</option>
+          <option value="카리나(봄)">카리나(봄)</option>
+        </select>
+      </div>
+
+      <div class="filter-actions">
+        <button class="filter-reset" id="filter-reset-btn">↺ 초기화</button>
+        <button class="filter-apply" id="filter-apply-btn">적용</button>
+      </div>
+    </div>
+  </div>
 
   <!-- MAP -->
   <div class="map-wrap">
@@ -265,10 +721,13 @@
     </div>
 
     <div class="legend">
-      <div class="leg"><div class="legdot" style="background:var(--accent)"></div>빌보드</div>
-      <div class="leg"><div class="legdot" style="background:var(--accent2)"></div>버스쉘터</div>
-      <div class="leg"><div class="legdot" style="background:var(--accent3)"></div>디지털</div>
-      <div class="leg"><div class="legdot" style="background:var(--green)"></div>지하철</div>
+      <div class="leg"><div class="legdot" style="background:#0088cc"></div>전광판</div>
+      <div class="leg"><div class="legdot" style="background:#6c47e8"></div>스크린도어</div>
+      <div class="leg"><div class="legdot" style="background:#e8521e"></div>랩핑</div>
+      <div class="leg"><div class="legdot" style="background:#12a87a"></div>쇼핑몰</div>
+      <div class="leg"><div class="legdot" style="background:#c97d06"></div>승강장</div>
+      <div class="leg"><div class="legdot" style="background:#cc2244"></div>역사</div>
+      <div class="leg"><div class="legdot" style="background:#00aabb"></div>버스쉘터</div>
     </div>
 
     <div class="map-hint">📌 지면 클릭 → 우측 분석 탭에서 확인</div>
@@ -282,7 +741,7 @@
     </div>
 
     <!-- 분석 탭 -->
-    <div class="tab-content analysis-tab" id="tab-analysis">
+    <div class="tab-content analysis-tab" id="tab-analysis" style="overflow-y:hidden;">
       <div class="ana-selected">
 
         <!-- 광고 지면 이미지 -->
@@ -340,10 +799,10 @@
             <div class="bar-track"><div class="bar-fill" style="width:68%;background:var(--accent2)"></div></div>
             <div class="bar-pct">68%</div>
           </div>
+        </div>
 
-          <div class="ana-divider"></div>
-
-          <!-- 견적 추가 버튼 -->
+        <!-- 하단 고정 CTA -->
+        <div class="panel-cta">
           <button class="wish-add-btn">＋ 견적에 추가</button>
         </div>
       </div>
@@ -351,27 +810,34 @@
 
     <!-- 견적 탭 -->
     <div class="tab-content quote-tab" id="tab-quote" style="display:none;">
-      <div style="padding:14px 16px 6px;"><div class="sec-label">선택 지면 목록</div></div>
-      <div id="wish-list" style="padding:0 16px;"></div>
-      <div id="quote-empty">
-        <div class="ana-empty" style="height:180px;">
-          <div class="ana-empty-icon">💰</div>
-          <div class="ana-empty-title">선택된 지면이 없습니다</div>
-          <div class="ana-empty-sub">지도에서 지면을 클릭하거나<br>분석 탭의 버튼으로 추가해주세요</div>
+      <!-- 스크롤 영역 -->
+      <div class="quote-scroll">
+        <div style="padding:4px 4px 6px;"><div class="sec-label">선택 지면 목록</div></div>
+        <div id="wish-list"></div>
+        <div id="quote-empty">
+          <div class="ana-empty" style="height:200px;">
+            <div class="ana-empty-icon">💰</div>
+            <div class="ana-empty-title">선택된 지면이 없습니다</div>
+            <div class="ana-empty-sub">지도에서 지면을 클릭하거나<br>분석 탭의 버튼으로 추가해주세요</div>
+          </div>
+        </div>
+        <div id="quote-summary" style="display:none;">
+          <div class="divider"></div>
+          <div class="sec-label">예상 견적 (1개월 기준)</div>
+          <div class="quote-box">
+            <div class="q-row"><span class="q-lbl">광고 집행비</span><span class="q-val" id="q-ad">-</span></div>
+            <div class="q-row"><span class="q-lbl">제작비 (약 10%)</span><span class="q-val" id="q-prod">-</span></div>
+            <div class="q-row"><span class="q-lbl">부가세 (10%)</span><span class="q-val" id="q-vat">-</span></div>
+          </div>
+          <div class="q-total">
+            <div class="q-total-lbl">월 총 예상 견적<small>VAT 포함 · 1개월 기준</small></div>
+            <div class="q-total-val" id="q-total-val">-</div>
+          </div>
         </div>
       </div>
-      <div id="quote-summary" style="display:none;padding:0 16px 16px;">
-        <div class="divider"></div>
-        <div class="sec-label">예상 견적 (1개월 기준)</div>
-        <div class="quote-box">
-          <div class="q-row"><span class="q-lbl">광고 집행비</span><span class="q-val" id="q-ad">-</span></div>
-          <div class="q-row"><span class="q-lbl">제작비 (약 10%)</span><span class="q-val" id="q-prod">-</span></div>
-          <div class="q-row"><span class="q-lbl">부가세 (10%)</span><span class="q-val" id="q-vat">-</span></div>
-        </div>
-        <div class="q-total">
-          <div class="q-total-lbl">월 총 예상 견적<small>VAT 포함 · 1개월 기준</small></div>
-          <div class="q-total-val" id="q-total-val">-</div>
-        </div>
+
+      <!-- 하단 고정 CTA -->
+      <div class="panel-cta" id="quote-cta" style="display:none;">
         <button class="btn-quote">📄 정식 견적 요청</button>
         <button class="btn-quote2">💾 견적 저장</button>
       </div>
@@ -388,6 +854,10 @@
   <div class="bar-sep"></div>
   <div class="bar-i">지도: 카카오맵 API 연동 예정</div>
 </div>
+
+</div><!-- /page-status -->
+
+<div id="page-mix" style="display:none;flex-direction:column;flex:1;min-height:0;"></div>
 
 <div class="mock-note">🎨 목업 v2 — 분석탭 클릭 상태 / 견적탭은 탭 전환 시 노출</div>
 
@@ -447,56 +917,122 @@
     .catch(() => console.warn('구 경계 데이터 로드 실패'));
 
   /* ── 상수 ── */
-  const TYPE_COLOR     = { bb: '#0088cc', dg: '#6c47e8', bs: '#e8521e', mt: '#12a87a' };
-  const TYPE_LABEL     = { bb: '야립 양면 빌보드', dg: '디지털 LED', bs: '버스쉘터', mt: '지하철 스크린' };
-  const TYPE_CLASS     = { bb: 'cyan', dg: 'purple', bs: 'orange', mt: 'green' };
-  const TYPE_EMOJI     = { bb: '🏙️', dg: '💡', bs: '🚌', mt: '🚇' };
-  const TYPE_TAG_CLASS = { bb: 'tc', dg: 'tp', bs: 'to', mt: 'tg' };
+  const TYPE_COLOR     = { jk: '#0088cc', sd: '#6c47e8', rp: '#e8521e', sm: '#12a87a', sg: '#c97d06', ys: '#cc2244', bs: '#00aabb' };
+  const TYPE_LABEL     = { jk: '전광판', sd: '스크린도어', rp: '랩핑', sm: '쇼핑몰', sg: '승강장', ys: '역사', bs: '버스쉘터' };
+  const TYPE_CLASS     = { jk: 'cyan', sd: 'purple', rp: 'orange', sm: 'green', sg: 'cyan', ys: 'orange', bs: 'purple' };
+  const TYPE_EMOJI     = { jk: '📺', sd: '🚪', rp: '🚌', sm: '🏬', sg: '🚉', ys: '🏛️', bs: '🚏' };
+  const TYPE_TAG_CLASS = { jk: 'tc', sd: 'tp', rp: 'to', sm: 'tg', sg: 'tc', ys: 'to', bs: 'tp' };
 
   /* ── 광고 지면 데이터 ── */
   const adSpots = [
-    { name: '강남대로 삼성타운 빌보드', type: 'bb', loc: [37.5010, 127.0245],
+    { name: '강남대로 전광판', type: 'jk', loc: [37.5010, 127.0245],
       addr: '강남구 강남대로 396 · 교차로 우측 상단', rentM: 12,
+      brand:'DX', season:'25SS', region:'강남', pt1:'DOOH', pt2:'전광판', status:'집행중', campaign:'카리나(봄)',
       stats: { exposure: '820만', traffic: '27만명', rent: '₩12M', cpm: '₩1,463' } },
-    { name: '홍대입구 디지털 사이니지', type: 'dg', loc: [37.5572, 126.9238],
-      addr: '마포구 홍익로 · 홍대입구역 2번 출구 앞', rentM: 9,
-      stats: { exposure: '650만', traffic: '22만명', rent: '₩9M', cpm: '₩1,385' } },
-    { name: '광화문 광장 빌보드', type: 'bb', loc: [37.5752, 126.9769],
+    { name: '광화문 전광판', type: 'jk', loc: [37.5752, 126.9769],
       addr: '종로구 세종대로 175 · 광화문광장 북측', rentM: 11,
+      brand:'MLB', season:'25FW', region:'강남', pt1:'DOOH', pt2:'전광판', status:'집행완료', campaign:'닝닝(봄)',
       stats: { exposure: '720만', traffic: '24만명', rent: '₩11M', cpm: '₩1,528' } },
-    { name: '잠실역 디지털 스크린', type: 'dg', loc: [37.5131, 127.1002],
-      addr: '송파구 올림픽로 · 잠실역 2번 출구', rentM: 8,
-      stats: { exposure: '580만', traffic: '19만명', rent: '₩8M', cpm: '₩1,379' } },
-    { name: '신촌 버스쉘터', type: 'bs', loc: [37.5557, 126.9368],
-      addr: '서대문구 신촌로 · 연세대 앞 정류장', rentM: 3.5,
-      stats: { exposure: '310만', traffic: '10만명', rent: '₩3.5M', cpm: '₩1,129' } },
-    { name: '명동역 지하철 광고', type: 'mt', loc: [37.5636, 126.9860],
-      addr: '중구 명동길 · 4호선 명동역 승강장', rentM: 5,
-      stats: { exposure: '450만', traffic: '15만명', rent: '₩5M', cpm: '₩1,111' } },
-    { name: '강서구 공항대로 빌보드', type: 'bb', loc: [37.5509, 126.8495],
-      addr: '강서구 공항대로 · 마곡나루역 방면', rentM: 7,
-      stats: { exposure: '480만', traffic: '16만명', rent: '₩7M', cpm: '₩1,458' } },
-    { name: '청담동 디지털 스크린', type: 'dg', loc: [37.5210, 127.0484],
-      addr: '강남구 압구정로 · 청담사거리 코너', rentM: 8.5,
-      stats: { exposure: '390만', traffic: '13만명', rent: '₩8.5M', cpm: '₩2,179' } },
+    { name: '강남역 스크린도어', type: 'sd', loc: [37.4979, 127.0276],
+      addr: '강남구 강남대로 · 2호선 강남역', rentM: 6.5,
+      brand:'DX', season:'25SS', region:'강남', pt1:'DOOH', pt2:'지하철', status:'집행중', campaign:'카리나(봄)',
+      stats: { exposure: '750만', traffic: '25만명', rent: '₩6.5M', cpm: '₩867' } },
+    { name: '홍대입구역 스크린도어', type: 'sd', loc: [37.5572, 126.9238],
+      addr: '마포구 홍익로 · 2호선 홍대입구역', rentM: 7,
+      brand:'MLB', season:'25SS', region:'홍대', pt1:'DOOH', pt2:'지하철', status:'집행전', campaign:'닝닝(봄)',
+      stats: { exposure: '640만', traffic: '21만명', rent: '₩7M', cpm: '₩1,094' } },
+    { name: '잠실역 스크린도어', type: 'sd', loc: [37.5131, 127.1002],
+      addr: '송파구 올림픽로 · 2호선 잠실역', rentM: 6,
+      brand:'DX', season:'25FW', region:'잠실', pt1:'DOOH', pt2:'지하철', status:'집행중', campaign:'카리나(봄)',
+      stats: { exposure: '580만', traffic: '19만명', rent: '₩6M', cpm: '₩1,034' } },
+    { name: '명동역 스크린도어', type: 'sd', loc: [37.5636, 126.9860],
+      addr: '중구 명동길 · 4호선 명동역', rentM: 5.5,
+      brand:'MLB', season:'25FW', region:'명동', pt1:'DOOH', pt2:'지하철', status:'집행중', campaign:'닝닝(봄)',
+      stats: { exposure: '510만', traffic: '17만명', rent: '₩5.5M', cpm: '₩1,078' } },
+    { name: '건대입구역 스크린도어', type: 'sd', loc: [37.5404, 127.0705],
+      addr: '광진구 능동로 · 2호선 건대입구역', rentM: 4.8,
+      brand:'DX', season:'25SS', region:'홍대', pt1:'DOOH', pt2:'지하철', status:'미집행', campaign:'카리나(봄)',
+      stats: { exposure: '420만', traffic: '14만명', rent: '₩4.8M', cpm: '₩1,143' } },
+    { name: '여의도역 스크린도어', type: 'sd', loc: [37.5219, 126.9245],
+      addr: '영등포구 여의대로 · 5호선 여의도역', rentM: 5,
+      brand:'MLB', season:'25FW', region:'여의도', pt1:'DOOH', pt2:'지하철', status:'집행전', campaign:'닝닝(봄)',
+      stats: { exposure: '460만', traffic: '15만명', rent: '₩5M', cpm: '₩1,087' } },
+    { name: '시청 버스 랩핑', type: 'rp', loc: [37.5665, 126.9780],
+      addr: '중구 세종대로 · 1·2호선 시청역 앞', rentM: 4,
+      brand:'DX', season:'25SS', region:'명동', pt1:'OOH', pt2:'버스쉘터', status:'집행중', campaign:'카리나(봄)',
+      stats: { exposure: '380만', traffic: '12만명', rent: '₩4M', cpm: '₩1,053' } },
+    { name: '혜화 버스 랩핑', type: 'rp', loc: [37.5809, 127.0019],
+      addr: '종로구 대학로 · 혜화역 앞', rentM: 3.5,
+      brand:'MLB', season:'25FW', region:'홍대', pt1:'OOH', pt2:'버스쉘터', status:'미집행', campaign:'닝닝(봄)',
+      stats: { exposure: '300만', traffic: '10만명', rent: '₩3.5M', cpm: '₩1,167' } },
+    { name: '영등포 버스 랩핑', type: 'rp', loc: [37.5158, 126.9068],
+      addr: '영등포구 경인로 · 영등포역 환승버스', rentM: 3.8,
+      brand:'DX', season:'25SS', region:'여의도', pt1:'OOH', pt2:'버스쉘터', status:'집행완료', campaign:'카리나(봄)',
+      stats: { exposure: '340만', traffic: '11만명', rent: '₩3.8M', cpm: '₩1,118' } },
+    { name: '코엑스몰 광고', type: 'sm', loc: [37.5120, 127.0590],
+      addr: '강남구 영동대로 513 · 코엑스몰 내부', rentM: 9,
+      brand:'DX', season:'25SS', region:'강남', pt1:'OOH', pt2:'쇼핑몰', status:'집행중', campaign:'카리나(봄)',
+      stats: { exposure: '520만', traffic: '17만명', rent: '₩9M', cpm: '₩1,731' } },
+    { name: '롯데월드몰 광고', type: 'sm', loc: [37.5126, 127.1025],
+      addr: '송파구 올림픽로 300 · 롯데월드몰 1층', rentM: 8.5,
+      brand:'MLB', season:'25FW', region:'잠실', pt1:'OOH', pt2:'쇼핑몰', status:'집행완료', campaign:'닝닝(봄)',
+      stats: { exposure: '490만', traffic: '16만명', rent: '₩8.5M', cpm: '₩1,735' } },
+    { name: 'IFC몰 광고', type: 'sm', loc: [37.5250, 126.9260],
+      addr: '영등포구 국제금융로 10 · IFC몰 B1', rentM: 7.5,
+      brand:'MLB', season:'25SS', region:'여의도', pt1:'OOH', pt2:'쇼핑몰', status:'집행전', campaign:'닝닝(봄)',
+      stats: { exposure: '430만', traffic: '14만명', rent: '₩7.5M', cpm: '₩1,744' } },
+    { name: '현대백화점 강남 광고', type: 'sm', loc: [37.5027, 127.0244],
+      addr: '강남구 압구정로 · 현대백화점 강남점', rentM: 8,
+      brand:'DX', season:'25FW', region:'강남', pt1:'OOH', pt2:'쇼핑몰', status:'집행중', campaign:'카리나(봄)',
+      stats: { exposure: '460만', traffic: '15만명', rent: '₩8M', cpm: '₩1,739' } },
+    { name: '서울역 승강장', type: 'sg', loc: [37.5550, 126.9724],
+      addr: '용산구 한강대로 · 1·4호선 서울역', rentM: 7,
+      brand:'MLB', season:'25FW', region:'명동', pt1:'OOH', pt2:'지하철', status:'집행완료', campaign:'닝닝(봄)',
+      stats: { exposure: '680만', traffic: '22만명', rent: '₩7M', cpm: '₩1,029' } },
+    { name: '용산역 승강장', type: 'sg', loc: [37.5298, 126.9650],
+      addr: '용산구 한강대로 · 경의선 용산역', rentM: 5.5,
+      brand:'DX', season:'25SS', region:'명동', pt1:'OOH', pt2:'지하철', status:'미집행', campaign:'카리나(봄)',
+      stats: { exposure: '430만', traffic: '14만명', rent: '₩5.5M', cpm: '₩1,279' } },
+    { name: '왕십리역 승강장', type: 'sg', loc: [37.5610, 127.0374],
+      addr: '성동구 왕십리로 · 2호선 왕십리역', rentM: 5,
+      brand:'MLB', season:'25SS', region:'홍대', pt1:'OOH', pt2:'지하철', status:'집행전', campaign:'닝닝(봄)',
+      stats: { exposure: '390만', traffic: '13만명', rent: '₩5M', cpm: '₩1,282' } },
+    { name: '신림역 승강장', type: 'sg', loc: [37.4845, 126.9295],
+      addr: '관악구 신림로 · 2호선 신림역', rentM: 4.5,
+      brand:'DX', season:'25FW', region:'강남', pt1:'OOH', pt2:'지하철', status:'집행중', campaign:'카리나(봄)',
+      stats: { exposure: '350만', traffic: '11.5만명', rent: '₩4.5M', cpm: '₩1,286' } },
+    { name: '수유역 승강장', type: 'sg', loc: [37.6484, 127.0646],
+      addr: '강북구 도봉로 · 4호선 수유역', rentM: 4,
+      brand:'MLB', season:'25FW', region:'홍대', pt1:'OOH', pt2:'지하철', status:'미집행', campaign:'닝닝(봄)',
+      stats: { exposure: '310만', traffic: '10만명', rent: '₩4M', cpm: '₩1,290' } },
+    { name: '강남역 역사 광고', type: 'ys', loc: [37.4972, 127.0282],
+      addr: '강남구 강남대로 · 2호선 강남역 대합실', rentM: 8,
+      brand:'DX', season:'25SS', region:'강남', pt1:'OOH', pt2:'지하철', status:'집행중', campaign:'카리나(봄)',
+      stats: { exposure: '700만', traffic: '23만명', rent: '₩8M', cpm: '₩1,143' } },
+    { name: '홍대입구역 역사 광고', type: 'ys', loc: [37.5565, 126.9230],
+      addr: '마포구 홍익로 · 2호선 홍대입구역 대합실', rentM: 6.5,
+      brand:'MLB', season:'25SS', region:'홍대', pt1:'OOH', pt2:'지하철', status:'집행전', campaign:'닝닝(봄)',
+      stats: { exposure: '580만', traffic: '19만명', rent: '₩6.5M', cpm: '₩1,121' } },
+    { name: '삼성역 역사 광고', type: 'ys', loc: [37.5088, 127.0633],
+      addr: '강남구 테헤란로 · 2호선 삼성역 대합실', rentM: 7,
+      brand:'DX', season:'25FW', region:'강남', pt1:'OOH', pt2:'지하철', status:'집행완료', campaign:'카리나(봄)',
+      stats: { exposure: '610만', traffic: '20만명', rent: '₩7M', cpm: '₩1,148' } },
+    { name: '판교역 역사 광고', type: 'ys', loc: [37.3947, 127.1112],
+      addr: '성남시 분당구 · 신분당선 판교역 대합실', rentM: 5,
+      brand:'MLB', season:'25FW', region:'판교', pt1:'OOH', pt2:'지하철', status:'집행전', campaign:'닝닝(봄)',
+      stats: { exposure: '380만', traffic: '12만명', rent: '₩5M', cpm: '₩1,316' } },
     { name: '이태원 버스쉘터', type: 'bs', loc: [37.5340, 126.9947],
       addr: '용산구 이태원로 · 이태원역 1번 출구 앞', rentM: 3,
+      brand:'MLB', season:'25SS', region:'명동', pt1:'OOH', pt2:'버스쉘터', status:'집행완료', campaign:'닝닝(봄)',
       stats: { exposure: '280만', traffic: '9만명', rent: '₩3M', cpm: '₩1,071' } },
-    { name: '건대입구역 지하철 광고', type: 'mt', loc: [37.5404, 127.0705],
-      addr: '광진구 능동로 · 2호선 건대입구역 승강장', rentM: 4.8,
-      stats: { exposure: '420만', traffic: '14만명', rent: '₩4.8M', cpm: '₩1,143' } },
-    { name: '종로3가 버스쉘터', type: 'bs', loc: [37.5720, 126.9920],
-      addr: '종로구 종로 · 종로3가 정류장', rentM: 4,
+    { name: '신촌 버스쉘터', type: 'bs', loc: [37.5557, 126.9368],
+      addr: '서대문구 신촌로 · 연세대 앞 정류장', rentM: 3.5,
+      brand:'DX', season:'25SS', region:'홍대', pt1:'OOH', pt2:'버스쉘터', status:'집행중', campaign:'카리나(봄)',
+      stats: { exposure: '310만', traffic: '10만명', rent: '₩3.5M', cpm: '₩1,129' } },
+    { name: '잠실 버스쉘터', type: 'bs', loc: [37.5144, 127.1020],
+      addr: '송파구 올림픽로 · 잠실역 앞 정류장', rentM: 4,
+      brand:'MLB', season:'25FW', region:'잠실', pt1:'OOH', pt2:'버스쉘터', status:'미집행', campaign:'닝닝(봄)',
       stats: { exposure: '350만', traffic: '11.5만명', rent: '₩4M', cpm: '₩1,143' } },
-    { name: '여의도 디지털 사이니지', type: 'dg', loc: [37.5219, 126.9245],
-      addr: '영등포구 여의대로 · IFC몰 정문 앞', rentM: 9.5,
-      stats: { exposure: '500만', traffic: '16.5만명', rent: '₩9.5M', cpm: '₩1,900' } },
-    { name: '강남역 지하철 광고', type: 'mt', loc: [37.4979, 127.0276],
-      addr: '강남구 강남대로 · 2호선 강남역 승강장', rentM: 6.5,
-      stats: { exposure: '750만', traffic: '25만명', rent: '₩6.5M', cpm: '₩867' } },
-    { name: '노원구 빌보드', type: 'bb', loc: [37.6540, 127.0569],
-      addr: '노원구 동일로 · 노원역 사거리 코너', rentM: 4.5,
-      stats: { exposure: '320만', traffic: '10.5만명', rent: '₩4.5M', cpm: '₩1,406' } },
   ];
 
   /* ── 집행 이력 데이터 ── */
@@ -538,6 +1074,10 @@
   let focusedSpot = null;          // 분석 탭에 표시되는 지면
   const selectedSpots = new Map(); // 견적에 담긴 지면 (name → spot)
   const markerMap     = new Map(); // name → Leaflet marker
+  // 적용된 필터 (적용 버튼 클릭 시 반영)
+  const activeFilters = { brand: '', season: '', region: '', pt1: '', pt2: '', status: '', campaign: '' };
+  // 미적용 필터 (셀렉트 변경 시 staging)
+  const pendingFilters = { brand: '', season: '', region: '', pt1: '', pt2: '', status: '', campaign: '' };
 
   /* ── 유틸 ── */
   function formatM(m) {
@@ -618,17 +1158,20 @@
     const list    = document.getElementById('wish-list');
     const empty   = document.getElementById('quote-empty');
     const summary = document.getElementById('quote-summary');
+    const cta     = document.getElementById('quote-cta');
 
     if (selectedSpots.size === 0) {
       list.innerHTML        = '';
       empty.style.display   = '';
       summary.style.display = 'none';
+      cta.style.display     = 'none';
       updateKPI();
       return;
     }
 
     empty.style.display   = 'none';
     summary.style.display = '';
+    cta.style.display     = '';
 
     list.innerHTML = [...selectedSpots.values()].map(spot => `
       <div class="wish-item">
@@ -692,6 +1235,62 @@
     });
   });
 
+  /* ── 필터 적용 ── */
+  function spotMatchesFilters(spot) {
+    for (const [key, val] of Object.entries(activeFilters)) {
+      if (val && spot[key] !== val) return false;
+    }
+    return true;
+  }
+
+  function applyFilters() {
+    markerMap.forEach((marker) => {
+      if (spotMatchesFilters(marker._spot)) {
+        if (!map.hasLayer(marker)) marker.addTo(map);
+      } else {
+        if (map.hasLayer(marker)) map.removeLayer(marker);
+      }
+    });
+  }
+
+  function hasPendingChanges() {
+    return Object.keys(activeFilters).some(k => pendingFilters[k] !== activeFilters[k]);
+  }
+
+  function updateApplyBtn() {
+    const btn = document.getElementById('filter-apply-btn');
+    if (hasPendingChanges()) {
+      btn.classList.add('dirty');
+      btn.textContent = '● 적용';
+    } else {
+      btn.classList.remove('dirty');
+      btn.textContent = '적용';
+    }
+  }
+
+  // 셀렉트 변경 시 pending 업데이트
+  document.querySelectorAll('.filter-select').forEach(sel => {
+    sel.addEventListener('change', () => {
+      pendingFilters[sel.dataset.filter] = sel.value;
+      updateApplyBtn();
+    });
+  });
+
+  // 적용 버튼
+  document.getElementById('filter-apply-btn').addEventListener('click', () => {
+    Object.assign(activeFilters, pendingFilters);
+    applyFilters();
+    updateApplyBtn();
+  });
+
+  // 필터 초기화 버튼
+  document.getElementById('filter-reset-btn').addEventListener('click', () => {
+    Object.keys(pendingFilters).forEach(k => { pendingFilters[k] = ''; activeFilters[k] = ''; });
+    document.querySelectorAll('.filter-select').forEach(sel => { sel.value = ''; });
+    applyFilters();
+    updateApplyBtn();
+  });
+
   /* ── "견적에 추가" 버튼 (분석 탭) ── */
   document.querySelector('.wish-add-btn').addEventListener('click', () => {
     if (!focusedSpot) return;
@@ -742,8 +1341,762 @@
   mc[0].addEventListener('click', () => map.zoomIn());
   mc[1].addEventListener('click', () => map.zoomOut());
   mc[2].addEventListener('click', () => map.setView(SEOUL_CENTER, 12));
+
+  /* ── 지하철역 ── */
+  const LINE_COLORS = {
+    1: '#0052A4', 2: '#00A84D', 3: '#EF7C1C', 4: '#00A5DE',
+    5: '#996CAC', 6: '#CD7C2F', 7: '#747F00', 8: '#E6186C', 9: '#BDB019'
+  };
+
+  const SUBWAY_STATIONS = [
+    // 1호선
+    { name: '청량리',     lines: [1],       loc: [37.5796, 127.0471] },
+    { name: '동대문',     lines: [1, 4],    loc: [37.5714, 127.0097] },
+    { name: '종로3가',    lines: [1, 3, 5], loc: [37.5717, 126.9920] },
+    { name: '종각',       lines: [1],       loc: [37.5699, 126.9827] },
+    { name: '시청',       lines: [1, 2],    loc: [37.5651, 126.9770] },
+    { name: '서울역',     lines: [1, 4],    loc: [37.5547, 126.9707] },
+    { name: '노량진',     lines: [1, 9],    loc: [37.5137, 126.9428] },
+    { name: '영등포',     lines: [1],       loc: [37.5159, 126.9074] },
+    { name: '신도림',     lines: [1, 2],    loc: [37.5087, 126.8911] },
+    // 2호선
+    { name: '을지로입구', lines: [2],       loc: [37.5663, 126.9826] },
+    { name: '을지로3가',  lines: [2, 3],    loc: [37.5659, 126.9916] },
+    { name: '동대문역사문화공원', lines: [2, 4, 5], loc: [37.5651, 127.0098] },
+    { name: '왕십리',     lines: [2, 5],    loc: [37.5614, 127.0375] },
+    { name: '건대입구',   lines: [2, 7],    loc: [37.5404, 127.0705] },
+    { name: '잠실',       lines: [2, 8],    loc: [37.5131, 127.1002] },
+    { name: '삼성',       lines: [2],       loc: [37.5088, 127.0627] },
+    { name: '선릉',       lines: [2],       loc: [37.5047, 127.0490] },
+    { name: '역삼',       lines: [2],       loc: [37.5006, 127.0363] },
+    { name: '강남',       lines: [2],       loc: [37.4979, 127.0276] },
+    { name: '교대',       lines: [2, 3],    loc: [37.4935, 127.0136] },
+    { name: '서초',       lines: [2],       loc: [37.4913, 127.0076] },
+    { name: '사당',       lines: [2, 4],    loc: [37.4764, 126.9813] },
+    { name: '신림',       lines: [2],       loc: [37.4843, 126.9294] },
+    { name: '당산',       lines: [2, 9],    loc: [37.5337, 126.9010] },
+    { name: '합정',       lines: [2, 6],    loc: [37.5496, 126.9145] },
+    { name: '홍대입구',   lines: [2],       loc: [37.5572, 126.9238] },
+    { name: '신촌',       lines: [2],       loc: [37.5557, 126.9368] },
+    { name: '이대',       lines: [2],       loc: [37.5561, 126.9466] },
+    { name: '아현',       lines: [2],       loc: [37.5568, 126.9559] },
+    { name: '충정로',     lines: [2, 5],    loc: [37.5585, 126.9612] },
+    { name: '종합운동장', lines: [2, 9],    loc: [37.5108, 127.0739] },
+    // 3호선
+    { name: '경복궁',     lines: [3],       loc: [37.5769, 126.9752] },
+    { name: '안국',       lines: [3],       loc: [37.5762, 126.9855] },
+    { name: '충무로',     lines: [3, 4],    loc: [37.5609, 126.9924] },
+    { name: '동대입구',   lines: [3],       loc: [37.5568, 127.0024] },
+    { name: '약수',       lines: [3, 6],    loc: [37.5508, 127.0123] },
+    { name: '옥수',       lines: [3],       loc: [37.5404, 127.0186] },
+    { name: '압구정',     lines: [3],       loc: [37.5270, 127.0295] },
+    { name: '신사',       lines: [3],       loc: [37.5176, 127.0200] },
+    { name: '고속터미널', lines: [3, 7, 9], loc: [37.5047, 127.0051] },
+    { name: '남부터미널', lines: [3],       loc: [37.4854, 127.0155] },
+    { name: '양재',       lines: [3],       loc: [37.4845, 127.0344] },
+    // 4호선
+    { name: '수유',       lines: [4],       loc: [37.6374, 127.0254] },
+    { name: '미아사거리', lines: [4],       loc: [37.6225, 127.0285] },
+    { name: '길음',       lines: [4],       loc: [37.6028, 127.0248] },
+    { name: '성신여대입구', lines: [4],     loc: [37.5924, 127.0163] },
+    { name: '한성대입구', lines: [4],       loc: [37.5869, 127.0065] },
+    { name: '혜화',       lines: [4],       loc: [37.5822, 127.0017] },
+    { name: '명동',       lines: [4],       loc: [37.5636, 126.9860] },
+    { name: '회현',       lines: [4],       loc: [37.5581, 126.9790] },
+    { name: '숙대입구',   lines: [4],       loc: [37.5466, 126.9721] },
+    { name: '삼각지',     lines: [4, 6],    loc: [37.5384, 126.9712] },
+    { name: '신용산',     lines: [4],       loc: [37.5310, 126.9685] },
+    { name: '이촌',       lines: [4],       loc: [37.5245, 126.9679] },
+    { name: '동작',       lines: [4, 9],    loc: [37.5046, 126.9813] },
+    { name: '노원',       lines: [4, 7],    loc: [37.6553, 127.0612] },
+    // 5호선
+    { name: '방화',       lines: [5],       loc: [37.5766, 126.8008] },
+    { name: '김포공항',   lines: [5, 9],    loc: [37.5639, 126.8011] },
+    { name: '마곡',       lines: [5],       loc: [37.5596, 126.8349] },
+    { name: '발산',       lines: [5],       loc: [37.5572, 126.8460] },
+    { name: '화곡',       lines: [5],       loc: [37.5500, 126.8563] },
+    { name: '오목교',     lines: [5],       loc: [37.5304, 126.8840] },
+    { name: '영등포구청', lines: [2, 5],    loc: [37.5261, 126.8952] },
+    { name: '여의도',     lines: [5, 9],    loc: [37.5219, 126.9245] },
+    { name: '여의나루',   lines: [5],       loc: [37.5254, 126.9328] },
+    { name: '마포',       lines: [5],       loc: [37.5403, 126.9484] },
+    { name: '공덕',       lines: [5, 6],    loc: [37.5436, 126.9518] },
+    { name: '서대문',     lines: [5],       loc: [37.5716, 126.9610] },
+    { name: '광화문',     lines: [5],       loc: [37.5718, 126.9769] },
+    { name: '군자',       lines: [5, 7],    loc: [37.5594, 127.0798] },
+    { name: '천호',       lines: [5, 8],    loc: [37.5386, 127.1237] },
+    { name: '강동',       lines: [5],       loc: [37.5301, 127.1336] },
+    // 6호선
+    { name: '응암',       lines: [6],       loc: [37.6019, 126.9196] },
+    { name: '디지털미디어시티', lines: [6], loc: [37.5785, 126.8965] },
+    { name: '월드컵경기장', lines: [6],     loc: [37.5694, 126.9024] },
+    { name: '망원',       lines: [6],       loc: [37.5558, 126.9100] },
+    { name: '상수',       lines: [6],       loc: [37.5473, 126.9236] },
+    { name: '효창공원앞', lines: [6],       loc: [37.5390, 126.9614] },
+    { name: '녹사평',     lines: [6],       loc: [37.5280, 126.9882] },
+    { name: '이태원',     lines: [6],       loc: [37.5340, 126.9947] },
+    { name: '한강진',     lines: [6],       loc: [37.5285, 127.0000] },
+    { name: '신당',       lines: [2, 6],    loc: [37.5651, 127.0189] },
+    { name: '고려대',     lines: [6],       loc: [37.5895, 127.0274] },
+    { name: '석계',       lines: [6],       loc: [37.6228, 127.0658] },
+    { name: '태릉입구',   lines: [6, 7],    loc: [37.6219, 127.0787] },
+    // 7호선
+    { name: '도봉산',     lines: [7],       loc: [37.6886, 127.0454] },
+    { name: '수락산',     lines: [7],       loc: [37.6764, 127.0478] },
+    { name: '중계',       lines: [7],       loc: [37.6519, 127.0779] },
+    { name: '중화',       lines: [7],       loc: [37.6084, 127.0883] },
+    { name: '상봉',       lines: [7],       loc: [37.5967, 127.0839] },
+    { name: '사가정',     lines: [7],       loc: [37.5856, 127.0904] },
+    { name: '어린이대공원', lines: [7],     loc: [37.5489, 127.0812] },
+    { name: '뚝섬유원지', lines: [7],       loc: [37.5312, 127.0678] },
+    { name: '청담',       lines: [7],       loc: [37.5198, 127.0521] },
+    { name: '강남구청',   lines: [7],       loc: [37.5175, 127.0437] },
+    { name: '학동',       lines: [7],       loc: [37.5120, 127.0357] },
+    { name: '논현',       lines: [7],       loc: [37.5115, 127.0254] },
+    { name: '반포',       lines: [7],       loc: [37.5054, 127.0017] },
+    { name: '내방',       lines: [7],       loc: [37.4954, 126.9943] },
+    { name: '이수',       lines: [7],       loc: [37.4853, 126.9814] },
+    { name: '대림',       lines: [2, 7],    loc: [37.4926, 126.8963] },
+    // 8호선
+    { name: '암사',       lines: [8],       loc: [37.5519, 127.1252] },
+    { name: '강동구청',   lines: [8],       loc: [37.5303, 127.1237] },
+    { name: '몽촌토성',   lines: [8],       loc: [37.5161, 127.1218] },
+    { name: '석촌',       lines: [8, 9],    loc: [37.5042, 127.1065] },
+    { name: '가락시장',   lines: [3, 8],    loc: [37.4941, 127.1157] },
+    { name: '문정',       lines: [8],       loc: [37.4905, 127.1271] },
+    { name: '모란',       lines: [8],       loc: [37.4366, 127.1290] },
+    // 9호선
+    { name: '마곡나루',   lines: [9],       loc: [37.5678, 126.8317] },
+    { name: '가양',       lines: [9],       loc: [37.5637, 126.8580] },
+    { name: '염창',       lines: [9],       loc: [37.5469, 126.8696] },
+    { name: '선유도',     lines: [9],       loc: [37.5360, 126.8975] },
+    { name: '국회의사당', lines: [9],       loc: [37.5284, 126.9162] },
+    { name: '노들',       lines: [9],       loc: [37.5152, 126.9347] },
+    { name: '흑석',       lines: [9],       loc: [37.5091, 126.9625] },
+    { name: '구반포',     lines: [9],       loc: [37.5067, 126.9939] },
+    { name: '신반포',     lines: [9],       loc: [37.5060, 127.0001] },
+    { name: '사평',       lines: [9],       loc: [37.5044, 127.0196] },
+    { name: '신논현',     lines: [9],       loc: [37.5044, 127.0254] },
+    { name: '언주',       lines: [9],       loc: [37.5108, 127.0375] },
+    { name: '선정릉',     lines: [9],       loc: [37.5090, 127.0462] },
+    { name: '삼성중앙',   lines: [9],       loc: [37.5126, 127.0559] },
+    { name: '봉은사',     lines: [9],       loc: [37.5148, 127.0598] },
+    { name: '삼전',       lines: [9],       loc: [37.5046, 127.0943] },
+    { name: '석촌고분',   lines: [9],       loc: [37.5053, 127.1003] },
+    { name: '한성백제',   lines: [9],       loc: [37.5069, 127.1170] },
+    { name: '올림픽공원', lines: [9],       loc: [37.5137, 127.1214] },
+  ];
+
+  const subwayLayer = L.layerGroup();
+
+  /* ── 호선별 역 순서 (노선도 순) ── */
+  const LINE_ROUTES = {
+    1: ['신도림','영등포','노량진','서울역','시청','종각','종로3가','동대문','청량리'],
+    2: ['시청','을지로입구','을지로3가','동대문역사문화공원','신당','왕십리',
+        '건대입구','종합운동장','잠실','삼성','선릉','역삼','강남','교대','서초',
+        '사당','신림','대림','신도림','영등포구청','당산','합정','홍대입구',
+        '신촌','이대','아현','충정로','시청'], // 순환
+    3: ['경복궁','안국','종로3가','을지로3가','충무로','동대입구','약수','옥수',
+        '압구정','신사','고속터미널','교대','남부터미널','양재'],
+    4: ['노원','수유','미아사거리','길음','성신여대입구','한성대입구','혜화',
+        '동대문','동대문역사문화공원','충무로','명동','회현','서울역','숙대입구',
+        '삼각지','신용산','이촌','동작','사당'],
+    5: ['방화','김포공항','마곡','발산','화곡','오목교','영등포구청','여의도',
+        '여의나루','마포','공덕','충정로','서대문','광화문','종로3가',
+        '동대문역사문화공원','왕십리','군자','천호','강동'],
+    6: ['응암','디지털미디어시티','월드컵경기장','망원','합정','상수','공덕',
+        '효창공원앞','삼각지','녹사평','이태원','한강진','약수','신당',
+        '고려대','석계','태릉입구'],
+    7: ['도봉산','수락산','노원','중계','태릉입구','중화','상봉','사가정',
+        '군자','어린이대공원','건대입구','뚝섬유원지','청담','강남구청',
+        '학동','논현','반포','고속터미널','내방','이수','대림'],
+    8: ['암사','천호','강동구청','몽촌토성','잠실','석촌','가락시장','문정','모란'],
+    9: ['김포공항','마곡나루','가양','염창','선유도','당산','국회의사당','여의도',
+        '노량진','노들','흑석','동작','구반포','신반포','고속터미널','사평',
+        '신논현','언주','선정릉','삼성중앙','봉은사','종합운동장','삼전',
+        '석촌고분','석촌','한성백제','올림픽공원'],
+  };
+
+  /* 역 이름 → 좌표 빠른 조회 */
+  const stationByName = new Map();
+  SUBWAY_STATIONS.forEach(st => stationByName.set(st.name, st));
+
+  /* ── 노선 폴리라인 먼저 그리기 (마커보다 아래 레이어) ── */
+  Object.entries(LINE_ROUTES).forEach(([lineNum, names]) => {
+    const coords = names.map(n => stationByName.get(n)?.loc).filter(Boolean);
+    if (coords.length < 2) return;
+    L.polyline(coords, {
+      color:     LINE_COLORS[+lineNum],
+      weight:    3.5,
+      opacity:   0.75,
+      lineCap:   'round',
+      lineJoin:  'round',
+      interactive: false,
+    }).addTo(subwayLayer);
+  });
+
+  /* ── 역 마커 ── */
+  SUBWAY_STATIONS.forEach(st => {
+    const primary = st.lines[0];
+    const color   = LINE_COLORS[primary];
+    const isXfer  = st.lines.length > 1;
+    const sz      = isXfer ? 10 : 7;
+
+    const xferDot = isXfer
+      ? `<div style="position:absolute;top:-2px;right:-2px;width:5px;height:5px;
+                     background:${LINE_COLORS[st.lines[1]]};border:1px solid white;
+                     border-radius:1px;"></div>`
+      : '';
+
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="width:${sz}px;height:${sz}px;background:${color};
+                         border:1.5px solid white;border-radius:${isXfer ? '3px' : '50%'};
+                         box-shadow:0 1px 3px rgba(0,0,0,.35);position:relative;">${xferDot}</div>`,
+      iconSize:   [sz, sz],
+      iconAnchor: [sz / 2, sz / 2]
+    });
+
+    const lineChips = st.lines
+      .map(l => `<span style="display:inline-block;padding:1px 5px;margin-right:2px;
+                              border-radius:3px;background:${LINE_COLORS[l]};
+                              color:white;font-size:10px;font-weight:700;">${l}호선</span>`)
+      .join('');
+
+    L.marker(st.loc, { icon, interactive: true, zIndexOffset: -200 })
+      .bindTooltip(
+        `<div style="font-size:12px;font-weight:700;margin-bottom:4px;">${st.name}</div>${lineChips}`,
+        { direction: 'top', offset: [0, -8], opacity: 1 }
+      )
+      .addTo(subwayLayer);
+  });
+
+  subwayLayer.addTo(map);
+
+  let subwayVisible = true;
+  const subwayBtn       = document.getElementById('subway-toggle-btn');
+  const subwayIndicator = document.getElementById('subway-toggle-indicator');
+
+  subwayBtn.addEventListener('click', () => {
+    subwayVisible = !subwayVisible;
+    if (subwayVisible) {
+      subwayLayer.addTo(map);
+      subwayIndicator.textContent = 'ON';
+      subwayIndicator.classList.remove('off');
+    } else {
+      map.removeLayer(subwayLayer);
+      subwayIndicator.textContent = 'OFF';
+      subwayIndicator.classList.add('off');
+    }
+  });
 })();
 </script>
 
+<script>
+(function() {
+  var pageMix    = document.getElementById('page-mix');
+  var pageStatus = document.getElementById('page-status');
+  var mixCloned  = false;
+
+  var TYPE_EMOJI_MX = { jk:'\u{1F4FA}', sd:'\u{1F6AA}', rp:'\u{1F68C}', sm:'\u{1F3EC}', sg:'\u{1F689}', ys:'\u{1F3DB}\uFE0F', bs:'\u{1F68F}' };
+  var TYPE_LABEL_MX = { jk:'\uC804\uAD11\uD310', sd:'\uC2A4\uD06C\uB9B0\uB3C4\uC5B4', rp:'\uB7A9\uD551', sm:'\uC1FC\uD551\uBAB0', sg:'\uC2B9\uAC15\uC7A5', ys:'\uC5ED\uC0AC', bs:'\uBC84\uC2A4\uC258\uD130' };
+
+  var productCatalog = [
+    { id:'gangnam_jk', name:'\uAC15\uB0A8\uB300\uB85C \uC804\uAD11\uD310', type:'jk', region:'\uAC15\uB0A8', rent:12, exposure:8200000, pt2:'\uC804\uAD11\uD310', addr:'\uAC15\uB0A8\uAD6C \uAC15\uB0A8\uB300\uB85C 396' },
+    { id:'gwanghwa_jk', name:'\uAD11\uD654\uBB38 \uC804\uAD11\uD310', type:'jk', region:'\uAC15\uB0A8', rent:11, exposure:7200000, pt2:'\uC804\uAD11\uD310', addr:'\uC885\uB85C\uAD6C \uC138\uC885\uB300\uB85C 175' },
+    { id:'gangnam_sd', name:'\uAC15\uB0A8\uC5ED \uC2A4\uD06C\uB9B0\uB3C4\uC5B4', type:'sd', region:'\uAC15\uB0A8', rent:6.5, exposure:7500000, pt2:'\uC9C0\uD558\uCCA0', addr:'\uAC15\uB0A8\uAD6C \uAC15\uB0A8\uB300\uB85C' },
+    { id:'hongdae_sd', name:'\uD64D\uB300\uC785\uAD6C\uC5ED \uC2A4\uD06C\uB9B0\uB3C4\uC5B4', type:'sd', region:'\uD64D\uB300', rent:7, exposure:6400000, pt2:'\uC9C0\uD558\uCCA0', addr:'\uB9C8\uD3EC\uAD6C \uD64D\uC775\uB85C' },
+    { id:'jamsil_sd', name:'\uC7A0\uC2E4\uC5ED \uC2A4\uD06C\uB9B0\uB3C4\uC5B4', type:'sd', region:'\uC7A0\uC2E4', rent:6, exposure:5800000, pt2:'\uC9C0\uD558\uCCA0', addr:'\uC1A1\uD30C\uAD6C \uC62C\uB9BC\uD53D\uB85C' },
+    { id:'myeongdong_sd', name:'\uBA85\uB3D9\uC5ED \uC2A4\uD06C\uB9B0\uB3C4\uC5B4', type:'sd', region:'\uBA85\uB3D9', rent:5.5, exposure:5100000, pt2:'\uC9C0\uD558\uCCA0', addr:'\uC911\uAD6C \uBA85\uB3D9\uAE38' },
+    { id:'kondae_sd', name:'\uAC74\uB300\uC785\uAD6C\uC5ED \uC2A4\uD06C\uB9B0\uB3C4\uC5B4', type:'sd', region:'\uD64D\uB300', rent:4.8, exposure:4200000, pt2:'\uC9C0\uD558\uCCA0', addr:'\uAD11\uC9C4\uAD6C \uB2A5\uB3D9\uB85C' },
+    { id:'yeouido_sd', name:'\uC5EC\uC758\uB3C4\uC5ED \uC2A4\uD06C\uB9B0\uB3C4\uC5B4', type:'sd', region:'\uC5EC\uC758\uB3C4', rent:5, exposure:4600000, pt2:'\uC9C0\uD558\uCCA0', addr:'\uC601\uB4F1\uD3EC\uAD6C \uC5EC\uC758\uB300\uB85C' },
+    { id:'city_rp', name:'\uC2DC\uCCAD \uBC84\uC2A4 \uB7A9\uD551', type:'rp', region:'\uBA85\uB3D9', rent:4, exposure:3800000, pt2:'\uBC84\uC2A4\uC258\uD130', addr:'\uC911\uAD6C \uC138\uC885\uB300\uB85C' },
+    { id:'hyehwa_rp', name:'\uD61C\uD654 \uBC84\uC2A4 \uB7A9\uD551', type:'rp', region:'\uD64D\uB300', rent:3.5, exposure:3000000, pt2:'\uBC84\uC2A4\uC258\uD130', addr:'\uC885\uB85C\uAD6C \uB300\uD559\uB85C' },
+    { id:'yeongdeungpo_rp', name:'\uC601\uB4F1\uD3EC \uBC84\uC2A4 \uB7A9\uD551', type:'rp', region:'\uC5EC\uC758\uB3C4', rent:3.8, exposure:3400000, pt2:'\uBC84\uC2A4\uC258\uD130', addr:'\uC601\uB4F1\uD3EC\uAD6C \uACBD\uC778\uB85C' },
+    { id:'coex_sm', name:'\uCF54\uC5D1\uC2A4\uBAB0 \uAD11\uACE0', type:'sm', region:'\uAC15\uB0A8', rent:9, exposure:5200000, pt2:'\uC1FC\uD551\uBAB0', addr:'\uAC15\uB0A8\uAD6C \uC601\uB3D9\uB300\uB85C 513' },
+    { id:'lotte_sm', name:'\uB86F\uB370\uC6D4\uB4DC\uBAB0 \uAD11\uACE0', type:'sm', region:'\uC7A0\uC2E4', rent:8.5, exposure:4900000, pt2:'\uC1FC\uD551\uBAB0', addr:'\uC1A1\uD30C\uAD6C \uC62C\uB9BC\uD53D\uB85C 300' },
+    { id:'ifc_sm', name:'IFC\uBAB0 \uAD11\uACE0', type:'sm', region:'\uC5EC\uC758\uB3C4', rent:7.5, exposure:4300000, pt2:'\uC1FC\uD551\uBAB0', addr:'\uC601\uB4F1\uD3EC\uAD6C \uAD6D\uC81C\uAE08\uC735\uB85C 10' },
+    { id:'hyundai_sm', name:'\uD604\uB300\uBC31\uD654\uC810 \uAC15\uB0A8 \uAD11\uACE0', type:'sm', region:'\uAC15\uB0A8', rent:8, exposure:4600000, pt2:'\uC1FC\uD551\uBAB0', addr:'\uAC15\uB0A8\uAD6C \uC555\uAD6C\uC815\uB85C' },
+    { id:'seoul_sg', name:'\uC11C\uC6B8\uC5ED \uC2B9\uAC15\uC7A5', type:'sg', region:'\uBA85\uB3D9', rent:7, exposure:6800000, pt2:'\uC9C0\uD558\uCCA0', addr:'\uC6A9\uC0B0\uAD6C \uD55C\uAC15\uB300\uB85C' },
+    { id:'yongsan_sg', name:'\uC6A9\uC0B0\uC5ED \uC2B9\uAC15\uC7A5', type:'sg', region:'\uBA85\uB3D9', rent:5.5, exposure:4300000, pt2:'\uC9C0\uD558\uCCA0', addr:'\uC6A9\uC0B0\uAD6C \uD55C\uAC15\uB300\uB85C' },
+    { id:'wangsimni_sg', name:'\uC655\uC2ED\uB9AC\uC5ED \uC2B9\uAC15\uC7A5', type:'sg', region:'\uD64D\uB300', rent:5, exposure:3900000, pt2:'\uC9C0\uD558\uCCA0', addr:'\uC131\uB3D9\uAD6C \uC655\uC2ED\uB9AC\uB85C' },
+    { id:'sinrim_sg', name:'\uC2E0\uB9BC\uC5ED \uC2B9\uAC15\uC7A5', type:'sg', region:'\uAC15\uB0A8', rent:4.5, exposure:3500000, pt2:'\uC9C0\uD558\uCCA0', addr:'\uAD00\uC545\uAD6C \uC2E0\uB9BC\uB85C' },
+    { id:'suyu_sg', name:'\uC218\uC720\uC5ED \uC2B9\uAC15\uC7A5', type:'sg', region:'\uD64D\uB300', rent:4, exposure:3100000, pt2:'\uC9C0\uD558\uCCA0', addr:'\uAC15\uBD81\uAD6C \uB3C4\uBD09\uB85C' },
+    { id:'gangnam_ys', name:'\uAC15\uB0A8\uC5ED \uC5ED\uC0AC \uAD11\uACE0', type:'ys', region:'\uAC15\uB0A8', rent:8, exposure:7000000, pt2:'\uC9C0\uD558\uCCA0', addr:'\uAC15\uB0A8\uAD6C \uAC15\uB0A8\uB300\uB85C' },
+    { id:'hongdae_ys', name:'\uD64D\uB300\uC785\uAD6C\uC5ED \uC5ED\uC0AC \uAD11\uACE0', type:'ys', region:'\uD64D\uB300', rent:6.5, exposure:5800000, pt2:'\uC9C0\uD558\uCCA0', addr:'\uB9C8\uD3EC\uAD6C \uD64D\uC775\uB85C' },
+    { id:'samsung_ys', name:'\uC0BC\uC131\uC5ED \uC5ED\uC0AC \uAD11\uACE0', type:'ys', region:'\uAC15\uB0A8', rent:7, exposure:6100000, pt2:'\uC9C0\uD558\uCCA0', addr:'\uAC15\uB0A8\uAD6C \uD14C\uD5E4\uB780\uB85C' },
+    { id:'pangyo_ys', name:'\uD310\uAD50\uC5ED \uC5ED\uC0AC \uAD11\uACE0', type:'ys', region:'\uD310\uAD50', rent:5, exposure:3800000, pt2:'\uC9C0\uD558\uCCA0', addr:'\uC131\uB0A8\uC2DC \uBD84\uB2F9\uAD6C' },
+    { id:'itaewon_bs', name:'\uC774\uD0DC\uC6D0 \uBC84\uC2A4\uC258\uD130', type:'bs', region:'\uBA85\uB3D9', rent:3, exposure:2800000, pt2:'\uBC84\uC2A4\uC258\uD130', addr:'\uC6A9\uC0B0\uAD6C \uC774\uD0DC\uC6D0\uB85C' },
+    { id:'sinchon_bs', name:'\uC2E0\uCD0C \uBC84\uC2A4\uC258\uD130', type:'bs', region:'\uD64D\uB300', rent:3.5, exposure:3100000, pt2:'\uBC84\uC2A4\uC258\uD130', addr:'\uC11C\uB300\uBB38\uAD6C \uC2E0\uCD0C\uB85C' },
+    { id:'jamsil_bs', name:'\uC7A0\uC2E4 \uBC84\uC2A4\uC258\uD130', type:'bs', region:'\uC7A0\uC2E4', rent:4, exposure:3500000, pt2:'\uBC84\uC2A4\uC258\uD130', addr:'\uC1A1\uD30C\uAD6C \uC62C\uB9BC\uD53D\uB85C' },
+  ];
+
+  var campaigns = [
+    { sel:false, name:'DX_닝닝(봄)_1안', period:'2026-02-01 ~ 2026-02-28', budget:200000000, items:[
+      productCatalog[0], productCatalog[2], productCatalog[11], productCatalog[20], productCatalog[25]
+    ]},
+    { sel:false, name:'DX_닝닝(봄)_2안', period:'2026-02-01 ~ 2026-02-28', budget:200000000, items:[
+      productCatalog[0], productCatalog[2], productCatalog[3], productCatalog[11], productCatalog[12], productCatalog[15], productCatalog[20], productCatalog[25]
+    ]},
+    { sel:false, name:'MLB_카리나(봄)', period:'2026-03-05 ~ 2026-03-21', budget:400000000, items:[
+      productCatalog[1], productCatalog[5], productCatalog[8], productCatalog[14], productCatalog[21], productCatalog[24]
+    ]},
+    { sel:false, name:'DX_변우석(봄)', period:'2026-04-15 ~ 2026-05-21', budget:300000000, items:[
+      productCatalog[13]
+    ]},
+  ];
+
+  function campMixBudget(c) { return c.items.reduce(function(s,x){ return s + x.rent * 1000000; }, 0); }
+  function campExposure(c) { return c.items.reduce(function(s,x){ return s + x.exposure; }, 0); }
+  function campCPM(c) { var e = campExposure(c); return e > 0 ? Math.round(campMixBudget(c) / (e/1000)) : 0; }
+
+  function fmtN(n) { return Number(n).toLocaleString('ko-KR'); }
+
+  function rowHTML(c, i) {
+    var mb = campMixBudget(c);
+    var exp = campExposure(c);
+    var cpm = campCPM(c);
+    return '<tr data-idx="'+i+'" class="'+(c.sel?'sel':'')+'">'
+      +'<td class="c"><input type="checkbox" data-idx="'+i+'"'+(c.sel?' checked':'')+' /></td>'
+      +'<td class="name">'+c.name+'</td>'
+      +'<td>'+c.period+'</td>'
+      +'<td class="mono r">'+fmtN(c.budget)+'</td>'
+      +'<td class="mono r">'+fmtN(mb)+'</td>'
+      +'<td class="mono r">'+c.items.length+'개</td>'
+      +'<td class="mono r">'+fmtN(exp)+'</td>'
+      +'<td class="mono r">'+fmtN(cpm)+'</td>'
+      +'</tr>';
+  }
+
+  var activeCampIdx = -1;
+
+  function renderCampKPI(c) {
+    var exp = campExposure(c);
+    var cpm = campCPM(c);
+    var traffic = Math.round(exp / 21);
+    var costPerPerson = traffic > 0 ? Math.round(c.budget / traffic) : 0;
+    var kpis = [
+      { lbl:'광고 지면',    val:fmtN(c.items.length),   unit:'개', sub:'집행 매체',   color:'var(--accent)' },
+      { lbl:'총 유동인구',  val:fmtN(traffic),          unit:'명', sub:'일 추정',     color:'var(--accent2)' },
+      { lbl:'총 노출수',    val:fmtN(exp),              unit:'회', sub:'집행 기간',   color:'var(--accent3)' },
+      { lbl:'광고 비용',    val:fmtN(c.budget),         unit:'원', sub:'예상 예산',   color:'var(--accent)' },
+      { lbl:'인구당 비용',  val:fmtN(costPerPerson),    unit:'원', sub:'',            color:'var(--accent3)' },
+      { lbl:'CPM',          val:fmtN(cpm),              unit:'원', sub:'',            color:'var(--green)' },
+    ];
+    var col = pageMix.querySelector('.campaign-kpi-col');
+    if (!col) return;
+
+    var kpiHTML = '<div class="camp-kpi-grid">'
+      + kpis.map(function(k){
+          return '<div class="camp-kpi-card" style="--ckc:'+k.color+'">'
+            +'<div class="camp-kpi-lbl">'+k.lbl+'</div>'
+            +'<div class="camp-kpi-val">'+k.val+'<small>'+k.unit+'</small></div>'
+            +(k.sub?'<div class="camp-kpi-sub">'+k.sub+'</div>':'')
+          +'</div>';
+        }).join('')
+      +'</div>';
+
+    var prodHTML = '<div class="camp-product-section">'
+      +'<div class="camp-product-header">'
+        +'<span class="camp-product-title">추가된 상품 ('+c.items.length+')</span>'
+        +'<button class="camp-btn primary" id="cb-add-product" style="padding:3px 10px;font-size:10px;">+ 상품 추가</button>'
+      +'</div>';
+
+    prodHTML += '<div class="camp-product-scroll">';
+    if (c.items.length === 0) {
+      prodHTML += '<div class="camp-product-empty">추가된 상품이 없습니다.<br>상품 추가 버튼을 클릭해주세요.</div>';
+    } else {
+      c.items.forEach(function(item, idx) {
+        prodHTML += '<div class="camp-product-item">'
+          +'<div class="camp-product-icon">'+(TYPE_EMOJI_MX[item.type]||'📦')+'</div>'
+          +'<div class="camp-product-info">'
+            +'<div class="camp-product-name">'+item.name+'</div>'
+            +'<div class="camp-product-meta">'+item.region+' · '+(TYPE_LABEL_MX[item.type]||item.pt2)+'</div>'
+          +'</div>'
+          +'<div class="camp-product-price">₩'+item.rent+'M</div>'
+          +'<button class="camp-product-del" data-pidx="'+idx+'" title="제거">✕</button>'
+        +'</div>';
+      });
+    }
+    prodHTML += '</div></div>';
+
+    col.innerHTML = kpiHTML + prodHTML;
+
+    // Product delete handlers
+    col.querySelectorAll('.camp-product-del').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var pidx = parseInt(btn.getAttribute('data-pidx'), 10);
+        c.items.splice(pidx, 1);
+        renderBody();
+        renderCampKPI(c);
+      });
+    });
+
+    // Add product button
+    var addBtn = col.querySelector('#cb-add-product');
+    if (addBtn) {
+      addBtn.addEventListener('click', function() {
+        showAddProductModal(c);
+      });
+    }
+  }
+
+  function showAddProductModal(campaign) {
+    var existing = document.querySelector('.add-product-modal');
+    if (existing) existing.remove();
+
+    var modal = document.createElement('div');
+    modal.className = 'add-product-modal';
+
+    var existingIds = campaign.items.map(function(x){ return x.id; });
+
+    var rows = productCatalog.map(function(p) {
+      var already = existingIds.indexOf(p.id) >= 0;
+      return '<div class="add-product-row'+(already?' already':'')+'" data-pid="'+p.id+'">'
+        +'<div class="add-product-row-icon">'+(TYPE_EMOJI_MX[p.type]||'📦')+'</div>'
+        +'<div class="add-product-row-info">'
+          +'<div class="add-product-row-name">'+p.name+(already?' <span style="font-size:9px;color:var(--muted);">(추가됨)</span>':'')+'</div>'
+          +'<div class="add-product-row-detail">'+p.region+' · '+p.addr+' · '+(TYPE_LABEL_MX[p.type]||p.pt2)+'</div>'
+        +'</div>'
+        +'<div class="add-product-row-price">₩'+p.rent+'M/월</div>'
+      +'</div>';
+    }).join('');
+
+    modal.innerHTML = '<div class="add-product-box">'
+      +'<div class="add-product-box-header">'
+        +'<span class="add-product-box-title">상품 추가 — '+campaign.name+'</span>'
+        +'<button class="add-product-box-close" id="modal-close">✕</button>'
+      +'</div>'
+      +'<div class="add-product-box-search">'
+        +'<input class="add-product-search-input" id="modal-search" placeholder="상품명, 지역으로 검색..." />'
+      +'</div>'
+      +'<div class="add-product-box-body" id="modal-body">'
+        + rows
+      +'</div>'
+      +'<div class="add-product-box-footer">'
+        +'<button class="camp-btn" id="modal-done">닫기</button>'
+      +'</div>'
+    +'</div>';
+
+    document.body.appendChild(modal);
+
+    // Close
+    modal.querySelector('#modal-close').addEventListener('click', function() { modal.remove(); });
+    modal.querySelector('#modal-done').addEventListener('click', function() { modal.remove(); });
+    modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
+
+    // Search filter
+    modal.querySelector('#modal-search').addEventListener('input', function(e) {
+      var q = e.target.value.trim().toLowerCase();
+      modal.querySelectorAll('.add-product-row').forEach(function(row) {
+        var pid = row.getAttribute('data-pid');
+        var p = productCatalog.find(function(x){ return x.id === pid; });
+        if (!p) return;
+        var match = !q || p.name.toLowerCase().indexOf(q) >= 0 || p.region.toLowerCase().indexOf(q) >= 0 || p.addr.toLowerCase().indexOf(q) >= 0;
+        row.style.display = match ? '' : 'none';
+      });
+    });
+
+    // Add product on click
+    modal.querySelectorAll('.add-product-row:not(.already)').forEach(function(row) {
+      row.addEventListener('click', function() {
+        var pid = row.getAttribute('data-pid');
+        var product = productCatalog.find(function(x){ return x.id === pid; });
+        if (product) {
+          campaign.items.push(product);
+          row.classList.add('already');
+          row.style.opacity = '.45';
+          row.style.pointerEvents = 'none';
+          var nameEl = row.querySelector('.add-product-row-name');
+          nameEl.innerHTML += ' <span style="font-size:9px;color:var(--muted);">(추가됨)</span>';
+          renderBody();
+          renderCampKPI(campaign);
+        }
+      });
+    });
+  }
+
+  function renderBody() {
+    var tbody = pageMix.querySelector('.campaign-table tbody');
+    if (!tbody) return;
+    if (campaigns.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:16px;color:var(--muted);">캠페인이 없습니다</td></tr>';
+    } else {
+      tbody.innerHTML = campaigns.map(function(c,i){
+        return rowHTML(c,i) ;
+      }).join('');
+    }
+    tbody.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+      cb.addEventListener('change', function(e) {
+        e.stopPropagation();
+        var i = parseInt(e.target.getAttribute('data-idx'), 10);
+        campaigns[i].sel = e.target.checked;
+        var tr = pageMix.querySelector('.campaign-table tr[data-idx="'+i+'"]');
+        if (tr) tr.classList.toggle('sel', e.target.checked);
+      });
+    });
+    tbody.querySelectorAll('tr[data-idx]').forEach(function(tr) {
+      tr.addEventListener('click', function(e) {
+        if (e.target.type === 'checkbox') return;
+        var i = parseInt(tr.getAttribute('data-idx'), 10);
+        activeCampIdx = i;
+        tbody.querySelectorAll('tr').forEach(function(r){ r.classList.remove('active'); });
+        tr.classList.add('active');
+        renderCampKPI(campaigns[i]);
+      });
+    });
+    // 이전 선택 복원
+    if (activeCampIdx >= 0 && activeCampIdx < campaigns.length) {
+      var activeRow = tbody.querySelector('tr[data-idx="'+activeCampIdx+'"]');
+      if (activeRow) activeRow.classList.add('active');
+    }
+  }
+
+  function buildStrip() {
+    var rows = campaigns.map(rowHTML).join('');
+    var emptyKPI = '<div class="camp-kpi-empty">'
+      +'<div class="camp-kpi-empty-icon">📊</div>'
+      +'<div>캠페인을 선택하면<br>성과 지표를 확인할 수 있습니다</div>'
+      +'</div>';
+
+    return '<div class="campaign-strip">'
+      +'<div class="camp-form" id="camp-form" style="display:none;">'
+        +'<span class="camp-form-label">캠페인명</span>'
+        +'<input class="camp-input w-name" id="cf-name" type="text" placeholder="예) DX_닝닝(봄)_1안" />'
+        +'<span class="camp-form-label">집행기간</span>'
+        +'<input class="camp-input w-date" id="cf-start" type="date" />'
+        +'<span class="camp-form-tilde">~</span>'
+        +'<input class="camp-input w-date" id="cf-end" type="date" />'
+        +'<span class="camp-form-label">예상 예산</span>'
+        +'<input class="camp-input w-budget" id="cf-budget" type="number" placeholder="0" min="0" />'
+        +'<button class="camp-btn primary" id="cf-ok">확인</button>'
+        +'<button class="camp-btn" id="cf-cancel">취소</button>'
+      +'</div>'
+      +'<div class="campaign-strip-body">'
+        +'<div class="campaign-table-col">'
+          +'<div class="campaign-strip-header">'
+            +'<span class="campaign-strip-title">※ 캠페인 리스트</span>'
+            +'<div class="campaign-strip-actions">'
+              +'<button class="camp-btn" id="cb-view">보기</button>'
+              +'<button class="camp-btn primary" id="cb-create">만들기</button>'
+              +'<button class="camp-btn" id="cb-edit">수정</button>'
+              +'<button class="camp-btn danger" id="cb-delete">삭제</button>'
+            +'</div>'
+          +'</div>'
+          +'<div class="campaign-table-wrap"><table class="campaign-table">'
+            +'<thead><tr>'
+              +'<th class="c">선택</th><th>캠페인명</th><th>집행 기간</th>'
+              +'<th class="r">예상 예산</th><th class="r">추가한 믹스 예산</th>'
+              +'<th class="r">추가된 상품 수</th><th class="r">총 노출수</th><th class="r">CPM</th>'
+            +'</tr></thead>'
+            +'<tbody>'+rows+'</tbody>'
+          +'</table></div>'
+        +'</div>'
+        +'<div class="campaign-kpi-col">'+emptyKPI+'</div>'
+      +'</div>'
+    +'</div>';
+  }
+
+  /* ── 미디어믹스 왼쪽 패널 빌더 ── */
+  function selHTML(id, opts) {
+    return '<select class="filter-select" id="'+id+'">'
+      + '<option value="">전체</option>'
+      + opts.map(function(o){ return '<option>'+o+'</option>'; }).join('')
+      + '</select>';
+  }
+
+  function buildMixLeftPanel() {
+    return '<div class="left-panel-header">'
+        + '<div class="left-panel-title">미디어믹스 필터</div>'
+        + '<div class="left-panel-sub">채널·지역 조건을 설정해주세요</div>'
+      + '</div>'
+      + '<div class="filter-scroll">'
+        + '<div class="filter-section"><div class="filter-label">지역</div>'
+          + selHTML('mx-region',['강남','명동','판교','잠실','홍대','여의도'])
+        + '</div>'
+        + '<div class="filter-section"><div class="filter-label">상품 유형 1</div>'
+          + selHTML('mx-pt1',['OOH','DOOH'])
+        + '</div>'
+        + '<div class="filter-section" style="border-bottom:none;"><div class="filter-label">상품 유형 2</div>'
+          + selHTML('mx-pt2',['전광판','지하철','버스쉘터','쇼핑몰'])
+        + '</div>'
+        + '<div style="height:1px;background:var(--border);margin:4px 0 0;"></div>'
+        + '<div class="ai-section">'
+          + '<div class="ai-section-header"><span class="ai-badge">AI</span><span class="ai-section-title">미디어믹스 추천</span></div>'
+          + '<div class="ai-section-sub">조건을 자연어로 입력하면<br>최적 미디어믹스를 추천해드립니다</div>'
+          + '<textarea class="ai-textarea" id="mx-ai-input" placeholder="예) 2030 여성 타겟, 강남·홍대 중심, 예산 1억, 브랜드 인지도 목적"></textarea>'
+          + '<button class="ai-btn" id="mx-ai-btn">✦ AI 추천 받기</button>'
+          + '<div class="ai-result" id="mx-ai-result"></div>'
+        + '</div>'
+      + '</div>';
+  }
+
+  /* ── AI 모의 추천 로직 ── */
+  function genReco(input) {
+    var budgetMatch = input.match(/(\d+(?:\.\d+)?)억/);
+    var budget = budgetMatch ? Math.round(parseFloat(budgetMatch[1]) * 100000000) : 100000000;
+    function fmtB(n) { return (n/100000000).toFixed(1)+'억'; }
+
+    var items = [];
+    if (input.match(/전광판|빌보드|야립|LED/))  items.push({ name:'전광판',   color:'#0088cc', w:35 });
+    if (input.match(/지하철|역사|스크린|승강장/)) items.push({ name:'지하철',   color:'#6c47e8', w:30 });
+    if (input.match(/쇼핑몰|몰|백화점/))          items.push({ name:'쇼핑몰',   color:'#12a87a', w:25 });
+    if (input.match(/버스|쉘터|랩핑/))            items.push({ name:'버스쉘터', color:'#00aabb', w:20 });
+
+    if (items.length === 0) {
+      if (input.match(/브랜드|인지|awareness/i))
+        items = [{name:'전광판',color:'#0088cc',w:40},{name:'지하철',color:'#6c47e8',w:30},{name:'쇼핑몰',color:'#12a87a',w:20},{name:'버스쉘터',color:'#00aabb',w:10}];
+      else if (input.match(/구매|전환|purchase|traffic/i))
+        items = [{name:'지하철',color:'#6c47e8',w:40},{name:'버스쉘터',color:'#00aabb',w:30},{name:'쇼핑몰',color:'#12a87a',w:20},{name:'전광판',color:'#0088cc',w:10}];
+      else
+        items = [{name:'전광판',color:'#0088cc',w:35},{name:'지하철',color:'#6c47e8',w:30},{name:'버스쉘터',color:'#00aabb',w:20},{name:'쇼핑몰',color:'#12a87a',w:15}];
+    }
+
+    var regionLabels = [];
+    if (input.match(/강남|삼성|코엑스/)) regionLabels.push('강남');
+    if (input.match(/홍대|신촌|마포/))   regionLabels.push('홍대');
+    if (input.match(/명동|시청/))         regionLabels.push('명동');
+    if (input.match(/잠실|송파/))         regionLabels.push('잠실');
+    if (input.match(/여의도|영등포/))     regionLabels.push('여의도');
+    if (regionLabels.length === 0)        regionLabels = ['강남', '홍대', '명동'];
+
+    var total = items.reduce(function(s,x){ return s+x.w; }, 0);
+    items.forEach(function(x){ x.ratio = Math.round(x.w/total*100); });
+    var diff = 100 - items.reduce(function(s,x){ return s+x.ratio; }, 0);
+    items[0].ratio += diff;
+
+    var maxRatio = Math.max.apply(null, items.map(function(x){ return x.ratio; }));
+    var rows = items.map(function(x){
+      return '<div class="ai-mix-row">'
+        + '<div class="ai-mix-name">'+x.name+'</div>'
+        + '<div class="ai-mix-track"><div class="ai-mix-fill" style="width:'+Math.round(x.ratio/maxRatio*100)+'%;background:'+x.color+'"></div></div>'
+        + '<div class="ai-mix-pct">'+x.ratio+'%</div>'
+        + '</div>';
+    }).join('');
+
+    var budgetLines = items.map(function(x){
+      return '· '+x.name+' '+fmtB(Math.round(budget*x.ratio/100));
+    }).join('<br>');
+
+    return '<div class="ai-result-lbl">추천 채널 믹스</div>'
+      + rows
+      + '<div class="ai-budget-box">'
+        + '<strong>예산 배분 (총 '+fmtB(budget)+')</strong>'
+        + budgetLines + '<br>'
+        + '· 추천 지역: ' + regionLabels.join(' · ')
+      + '</div>';
+  }
+
+  function attachAiEvents() {
+    var btn    = pageMix.querySelector('#mx-ai-btn');
+    var input  = pageMix.querySelector('#mx-ai-input');
+    var result = pageMix.querySelector('#mx-ai-result');
+    if (!btn) return;
+
+    btn.addEventListener('click', function() {
+      var txt = input.value.trim();
+      if (!txt) { input.focus(); return; }
+      btn.disabled = true;
+      result.innerHTML = '<div class="ai-loading"><div class="ai-spinner"></div>분석 중...</div>';
+      setTimeout(function() {
+        result.innerHTML = genReco(txt);
+        btn.disabled = false;
+      }, 1400);
+    });
+
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) btn.click();
+    });
+  }
+
+  function attachEvents() {
+    /* 체크박스 */
+    pageMix.querySelectorAll('.campaign-table input[type="checkbox"]').forEach(function(cb) {
+      cb.addEventListener('change', function(e) {
+        var i = parseInt(e.target.getAttribute('data-idx'), 10);
+        campaigns[i].sel = e.target.checked;
+        var tr = pageMix.querySelector('.campaign-table tr[data-idx="'+i+'"]');
+        if (tr) tr.classList.toggle('sel', e.target.checked);
+      });
+    });
+
+    var form = pageMix.querySelector('#camp-form');
+
+    /* 만들기 — 폼 토글 */
+    pageMix.querySelector('#cb-create').addEventListener('click', function() {
+      form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+    });
+
+    /* 취소 */
+    pageMix.querySelector('#cf-cancel').addEventListener('click', function() {
+      form.style.display = 'none';
+      pageMix.querySelector('#cf-name').value   = '';
+      pageMix.querySelector('#cf-start').value  = '';
+      pageMix.querySelector('#cf-end').value    = '';
+      pageMix.querySelector('#cf-budget').value = '';
+    });
+
+    /* 확인 — 새 캠페인 추가 */
+    pageMix.querySelector('#cf-ok').addEventListener('click', function() {
+      var name   = pageMix.querySelector('#cf-name').value.trim();
+      var start  = pageMix.querySelector('#cf-start').value;
+      var end    = pageMix.querySelector('#cf-end').value;
+      var budget = parseInt(pageMix.querySelector('#cf-budget').value, 10) || 0;
+      if (!name) { pageMix.querySelector('#cf-name').focus(); return; }
+      var period = (start && end) ? start+' ~ '+end : (start || end || '-');
+      campaigns.push({ sel:false, name:name, period:period, budget:budget, items:[] });
+      renderBody();
+      pageMix.querySelector('#cf-name').value   = '';
+      pageMix.querySelector('#cf-start').value  = '';
+      pageMix.querySelector('#cf-end').value    = '';
+      pageMix.querySelector('#cf-budget').value = '';
+      form.style.display = 'none';
+    });
+
+    /* 삭제 — 선택된 항목 제거 */
+    pageMix.querySelector('#cb-delete').addEventListener('click', function() {
+      var sel = campaigns.filter(function(c){ return c.sel; });
+      if (!sel.length) { alert('삭제할 캠페인을 선택해주세요.'); return; }
+      if (!confirm(sel.length+'개 캠페인을 삭제하시겠습니까?')) return;
+      campaigns = campaigns.filter(function(c){ return !c.sel; });
+      renderBody();
+    });
+  }
+
+  /* ── 페이지 탭 전환 ── */
+  document.getElementById('ptab-status').addEventListener('click', function() {
+    document.getElementById('ptab-status').classList.add('on');
+    document.getElementById('ptab-mix').classList.remove('on');
+    pageStatus.style.display = 'flex';
+    pageMix.style.display = 'none';
+  });
+
+  document.getElementById('ptab-mix').addEventListener('click', function() {
+    document.getElementById('ptab-mix').classList.add('on');
+    document.getElementById('ptab-status').classList.remove('on');
+    pageStatus.style.display = 'none';
+    pageMix.style.display = 'flex';
+
+    if (!mixCloned) {
+      mixCloned = true;
+      pageMix.innerHTML = pageStatus.innerHTML;
+      var kpi = pageMix.querySelector('.kpi-strip');
+      if (kpi) {
+        var tmp = document.createElement('div');
+        tmp.innerHTML = buildStrip();
+        kpi.parentNode.insertBefore(tmp.firstElementChild, kpi);
+        kpi.remove();
+      }
+
+      var lp = pageMix.querySelector('.left-panel');
+      if (lp) lp.innerHTML = buildMixLeftPanel();
+
+      attachEvents();
+      renderBody();
+      attachAiEvents();
+    }
+  });
+})();
+</script>
 </body>
 </html>
